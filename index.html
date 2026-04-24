@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Osyane · Sistema de Gamificación FISEI-UTA</title>
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#003087" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Osyane" />
+<link rel="apple-touch-icon" href="assets/uta-logo.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.14/dist/index.global.min.js"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
+<script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
+<style type="text/tailwindcss">
+  @theme {
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+    --color-uta-blue: #003087;
+    --color-uta-blue-700: #002168;
+    --color-uta-blue-600: #0a3fa0;
+    --color-uta-blue-500: #1a56c4;
+    --color-uta-blue-50: #eef3fb;
+    --color-uta-gold: #FFB800;
+    --color-uta-gold-600: #e0a200;
+    --color-uta-gold-100: #fff4d6;
+    --color-uta-gold-50: #fffaec;
+
+    --color-ink-900: #0f1320;
+    --color-ink-800: #1b2036;
+    --color-ink-700: #2b3250;
+    --color-ink-600: #4a5170;
+    --color-ink-500: #6b7293;
+    --color-ink-400: #9097b5;
+    --color-ink-300: #c0c5da;
+    --color-ink-200: #dde1ef;
+    --color-ink-100: #ebeef7;
+    --color-ink-50: #f5f7fc;
+
+    --color-paper: #fbfaf6;
+    --color-line: #e6e8f1;
+    --color-positive: #1f7a4a;
+    --color-warning: #b87d00;
+    --color-danger: #b5352a;
+
+    --shadow-card: 0 1px 0 rgba(15,19,32,0.04), 0 1px 2px rgba(15,19,32,0.04);
+    --shadow-pop:  0 4px 24px -6px rgba(15,19,32,0.15), 0 1px 2px rgba(15,19,32,0.06);
+  }
+</style>
+<style>
+  html, body { background: #fbfaf6; color: #0f1320; }
+  body { font-family: 'Inter', system-ui, sans-serif; }
+  .num { font-family: 'JetBrains Mono', ui-monospace, monospace; font-feature-settings: "tnum"; }
+  .hatch-stripes {
+    background-image: repeating-linear-gradient(135deg, rgba(15,19,32,0.05) 0 1px, transparent 1px 10px);
+  }
+  .hatch-gold {
+    background-image: repeating-linear-gradient(135deg, rgba(255,184,0,0.18) 0 1px, transparent 1px 8px);
+  }
+  .hatch-blue {
+    background-image: repeating-linear-gradient(135deg, rgba(0,48,135,0.14) 0 1px, transparent 1px 8px);
+  }
+  /* subtle animated bar */
+  @keyframes xpShine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(200%); }
+  }
+  .xp-shine::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.55) 50%, transparent 100%);
+    animation: xpShine 2.8s ease-in-out infinite;
+    mix-blend-mode: overlay;
+  }
+  @keyframes riseIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .rise-in { animation: riseIn .45s ease-out both; }
+  @keyframes countTick {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-1px); }
+  }
+  .pulse-dot { animation: countTick 1.6s ease-in-out infinite; }
+  /* ── Mobile responsive overrides ── */
+  @media (max-width: 768px) {
+    .mobile-hide { display: none !important; }
+    .mobile-full { width: 100% !important; }
+    .mobile-stack { flex-direction: column !important; }
+    .mobile-grid-1 { grid-template-columns: 1fr !important; }
+    .mobile-grid-2 { grid-template-columns: 1fr 1fr !important; }
+    .mobile-p { padding: 16px !important; }
+    .mobile-small-text { font-size: 11px !important; }
+  }
+  /* scrollbar polish */
+  *::-webkit-scrollbar { width: 10px; height: 10px; }
+  *::-webkit-scrollbar-thumb { background: #dde1ef; border-radius: 8px; }
+  *::-webkit-scrollbar-track { background: transparent; }
+  /* custom radio/toggle */
+  .toggle-pill { transition: all .18s ease; }
+  /* thin dashed separator */
+  .sep { border-top: 1px dashed #e6e8f1; }
+
+  /* === Fallback utilities for classes Tailwind v4 browser may miss in dynamic JSX === */
+  .col-span-1 { grid-column: span 1 / span 1; }
+  .col-span-2 { grid-column: span 2 / span 2; }
+  .col-span-3 { grid-column: span 3 / span 3; }
+  .col-span-4 { grid-column: span 4 / span 4; }
+  .col-span-5 { grid-column: span 5 / span 5; }
+  .col-span-6 { grid-column: span 6 / span 6; }
+  .col-span-7 { grid-column: span 7 / span 7; }
+  .col-span-8 { grid-column: span 8 / span 8; }
+  .col-span-9 { grid-column: span 9 / span 9; }
+  .col-span-12 { grid-column: span 12 / span 12; }
+  @media (min-width: 1024px) {
+    .lg\:col-span-3  { grid-column: span 3 / span 3; }
+    .lg\:col-span-4  { grid-column: span 4 / span 4; }
+    .lg\:col-span-5  { grid-column: span 5 / span 5; }
+    .lg\:col-span-8  { grid-column: span 8 / span 8; }
+  }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel" src="src/data.jsx"></script>
+  <script type="text/babel" src="src/icons.jsx"></script>
+  <script type="text/babel" src="src/ui.jsx"></script>
+  <script type="text/babel" src="src/charts.jsx"></script>
+  <script type="text/babel" src="src/store.jsx"></script>
+  <script type="text/babel" src="src/view-dashboard.jsx"></script>
+  <script type="text/babel" src="src/view-leaderboard.jsx"></script>
+  <script type="text/babel" src="src/view-badges.jsx"></script>
+  <script type="text/babel" src="src/view-progress.jsx"></script>
+  <script type="text/babel" src="src/view-teacher.jsx"></script>
+  <script type="text/babel" src="src/app.jsx"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "name": "Osyane — Gamificación FISEI-UTA",
+  "short_name": "Osyane",
+  "description": "Sistema de Gamificación y Ranking Académico · FISEI · Universidad Técnica de Ambato",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fbfaf6",
+  "theme_color": "#003087",
+  "orientation": "any",
+  "icons": [
+    { "src": "assets/uta-logo.jpg", "sizes": "192x192", "type": "image/jpeg" },
+    { "src": "assets/uta-logo.jpg", "sizes": "512x512", "type": "image/jpeg" }
+  ],
+  "categories": ["education", "productivity"]
+}
