@@ -3,6 +3,7 @@
 
 const {
   AreaChart, Area, BarChart, Bar, RadialBarChart, RadialBar,
+  RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   Cell, PieChart, Pie, Legend
 } = Recharts;
@@ -89,4 +90,31 @@ function SubjectProgressBars({ data }) {
   );
 }
 
-Object.assign(window, { XPAreaChart, SubjectBarChart, MiniSparkline, SubjectProgressBars });
+// Radar chart — Competencias por área
+const COMPETENCIAS_DATA = [
+  { area: 'Algoritmos',    value: 78 },
+  { area: 'Bases de Datos',value: 65 },
+  { area: 'POO',           value: 88 },
+  { area: 'Redes',         value: 52 },
+  { area: 'Matemáticas',   value: 70 },
+  { area: 'Soft Skills',   value: 83 },
+];
+
+function CompetenciasRadar({ data = COMPETENCIAS_DATA, height = 260 }) {
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <RadarChart cx="50%" cy="50%" outerRadius="72%" data={data}>
+        <PolarGrid stroke="#dde1ef" />
+        <PolarAngleAxis dataKey="area" tick={{ fontSize: 11, fill: '#4a5170', fontFamily: 'Inter, sans-serif', fontWeight: 600 }} />
+        <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 9, fill: '#c0c5da' }} tickCount={4} axisLine={false} />
+        <Radar dataKey="value" stroke="#003087" strokeWidth={2} fill="#003087" fillOpacity={0.12}
+          dot={{ r: 4, fill: '#FFB800', stroke: '#FFB800', strokeWidth: 0 }} />
+        <Tooltip
+          contentStyle={{ background: '#fff', border: '1px solid #e6e8f1', borderRadius: 8, fontSize: 12, fontFamily: 'Inter, sans-serif' }}
+          formatter={(v) => [`${v}%`, 'Competencia']} />
+      </RadarChart>
+    </ResponsiveContainer>
+  );
+}
+
+Object.assign(window, { XPAreaChart, SubjectBarChart, MiniSparkline, SubjectProgressBars, CompetenciasRadar, COMPETENCIAS_DATA });

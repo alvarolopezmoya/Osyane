@@ -35,11 +35,110 @@ function App() {
   );
 }
 
+// ── Profile Modal ──────────────────────────────────────────────────────────────
+function ProfileModal({ open, onClose }) {
+  const { myStudent, levelInfo, myRank, leaderboard } = useApp();
+  if (!open) return null;
+  const earnedBadges = BADGES.filter(b => myStudent.earnedBadges.includes(b.id));
+  const xpToNext = levelInfo.max === Infinity ? 0 : levelInfo.max - levelInfo.xp;
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,19,32,0.5)', zIndex: 1000,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
+      onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} className="rise-in"
+        style={{ background: '#fff', borderRadius: 18, width: 420, maxWidth: '100%',
+          boxShadow: '0 24px 80px rgba(15,19,32,0.22)', overflow: 'hidden' }}>
+
+        {/* Header banner */}
+        <div style={{ background: '#003087', padding: '28px 28px 20px', position: 'relative', overflow: 'hidden' }}>
+          <div className="hatch-blue" style={{ position: 'absolute', inset: 0, opacity: 0.35 }} />
+          <button onClick={onClose} style={{ position: 'absolute', top: 14, right: 14, background: 'rgba(255,255,255,0.15)',
+            border: 'none', borderRadius: 6, cursor: 'pointer', color: '#fff', display: 'flex', padding: 6 }}>
+            <IcoClose size={14} />
+          </button>
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 18 }}>
+            <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#FFB800',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 22, fontWeight: 900, color: '#2a1a00', fontFamily: 'JetBrains Mono, monospace',
+              boxShadow: '0 0 0 4px rgba(255,184,0,0.25)', flexShrink: 0 }}>
+              {myStudent.initials}
+            </div>
+            <div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: '#fff', marginBottom: 4 }}>{myStudent.name}</div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                <span style={{ background: '#FFB800', color: '#2a1a00', borderRadius: 5, padding: '2px 8px',
+                  fontSize: 10, fontWeight: 800, letterSpacing: '.05em' }}>N{levelInfo.n} · {levelInfo.title}</span>
+                {myStudent.streak > 0 && (
+                  <span style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', borderRadius: 5,
+                    padding: '2px 8px', fontSize: 10, fontWeight: 700 }}>🔥 {myStudent.streak} días</span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div style={{ padding: '20px 28px 24px' }}>
+          {/* XP bar */}
+          <div style={{ marginBottom: 18 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+              <span style={{ fontSize: 12, color: '#6b7293' }}>Progreso al nivel {levelInfo.n + 1}</span>
+              <span style={{ fontSize: 12, fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, color: '#003087' }}>
+                {myStudent.xp.toLocaleString()} XP
+              </span>
+            </div>
+            <XPBar progress={levelInfo.progress} height={8} />
+            <div style={{ fontSize: 11, color: '#9097b5', marginTop: 5, textAlign: 'right' }}>
+              {levelInfo.max !== Infinity ? `Faltan ${xpToNext.toLocaleString()} XP` : 'Nivel máximo'}
+            </div>
+          </div>
+
+          {/* Stats grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 18 }}>
+            {[
+              { label: 'XP Total', value: myStudent.xp.toLocaleString() },
+              { label: 'Ranking', value: `#${myRank}` },
+              { label: 'Insignias', value: earnedBadges.length },
+            ].map((s, i) => (
+              <div key={i} style={{ background: '#f5f7fc', borderRadius: 10, padding: '10px 12px', textAlign: 'center' }}>
+                <div style={{ fontSize: 17, fontWeight: 800, color: '#1b2036', fontFamily: 'JetBrains Mono, monospace' }}>{s.value}</div>
+                <div style={{ fontSize: 10, color: '#9097b5', marginTop: 3, fontWeight: 600, letterSpacing: '.04em', textTransform: 'uppercase' }}>{s.label}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Badges earned */}
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#9097b5', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>
+              Insignias obtenidas
+            </div>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {earnedBadges.map(b => (
+                <div key={b.id} title={b.name} style={{ width: 38, height: 38, borderRadius: 9,
+                  background: '#fffaec', border: '1.5px solid #FFB800',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>
+                  {b.icon}
+                </div>
+              ))}
+              {earnedBadges.length === 0 && (
+                <span style={{ fontSize: 12, color: '#c0c5da' }}>Aún no has ganado insignias</span>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AppShell() {
-  const { activeView, setActiveView, myStudent, levelInfo, toast, setToast } = useApp();
+  const { activeView, setActiveView, myStudent, levelInfo, toast, setToast,
+    showRealNames, setShowRealNames, notifications, unreadCount, notifOpen, setNotifOpen, markAllRead } = useApp();
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [collapsed, setCollapsed] = React.useState(false);
+  const [profileOpen, setProfileOpen] = React.useState(false);
 
   // Close sidebar on nav on mobile
   function navigate(id) {
@@ -128,7 +227,10 @@ function AppShell() {
                   <Avatar initials={myStudent.initials} size={32} colorIndex={0} />
                 </div>
               : (
-                <div style={{ background: '#eef3fb', borderRadius: 10, padding: '10px 12px' }}>
+                <div onClick={() => setProfileOpen(true)}
+                  style={{ background: '#eef3fb', borderRadius: 10, padding: '10px 12px', cursor: 'pointer', transition: 'background .15s' }}
+                  onMouseEnter={e => e.currentTarget.style.background = '#dce8fa'}
+                  onMouseLeave={e => e.currentTarget.style.background = '#eef3fb'}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                     <Avatar initials={myStudent.initials} size={30} colorIndex={0} />
                     <div style={{ overflow: 'hidden' }}>
@@ -197,20 +299,65 @@ function AppShell() {
           <div style={{ flex: 1 }} />
 
           {!isMobile && (
-            <button style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 12px',
-              border: '1px solid #e6e8f1', borderRadius: 8, background: '#fff',
-              cursor: 'pointer', fontSize: 12, color: '#4a5170', fontFamily: 'Inter, sans-serif' }}>
+            <button onClick={() => setShowRealNames(v => !v)}
+              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 12px',
+                border: '1px solid #e6e8f1', borderRadius: 8,
+                background: showRealNames ? '#fff' : '#eef3fb',
+                cursor: 'pointer', fontSize: 12,
+                color: showRealNames ? '#4a5170' : '#003087',
+                fontFamily: 'Inter, sans-serif', transition: 'all .15s' }}>
               <IcoEye size={14} />
-              <span>Nombre real</span>
+              <span>{showRealNames ? 'Ocultar nombres' : 'Mostrar nombres'}</span>
             </button>
           )}
           <div style={{ width: 1, height: 24, background: '#e6e8f1' }} />
-          <button style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            width: 34, height: 34, border: '1px solid #e6e8f1', borderRadius: 8, background: '#fff', cursor: 'pointer', flexShrink: 0 }}>
-            <IcoBell size={16} />
-            <span style={{ position: 'absolute', top: 6, right: 6, width: 7, height: 7,
-              borderRadius: '50%', background: '#FFB800', border: '1.5px solid #fff' }} className="pulse-dot" />
-          </button>
+          <div style={{ position: 'relative' }}>
+            <button onClick={() => { setNotifOpen(v => !v); markAllRead(); }}
+              style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                width: 34, height: 34, border: '1px solid #e6e8f1', borderRadius: 8, background: notifOpen ? '#eef3fb' : '#fff',
+                cursor: 'pointer', flexShrink: 0 }}>
+              <IcoBell size={16} />
+              {unreadCount > 0 && (
+                <span style={{ position: 'absolute', top: 5, right: 5, width: 8, height: 8,
+                  borderRadius: '50%', background: '#FFB800', border: '1.5px solid #fff' }} className="pulse-dot" />
+              )}
+            </button>
+            {notifOpen && (
+              <div style={{ position: 'absolute', top: 42, right: 0, width: 320, background: '#fff',
+                border: '1px solid #e6e8f1', borderRadius: 14, boxShadow: '0 12px 40px rgba(15,19,32,0.15)',
+                zIndex: 500, overflow: 'hidden' }}>
+                <div style={{ padding: '14px 18px 10px', borderBottom: '1px solid #ebeef7', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontWeight: 700, fontSize: 14, color: '#1b2036' }}>Notificaciones</span>
+                  <button onClick={() => setNotifOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9097b5', display: 'flex' }}>
+                    <IcoClose size={14} />
+                  </button>
+                </div>
+                {notifications.map((n, i) => (
+                  <div key={n.id} style={{ display: 'flex', gap: 12, padding: '11px 18px',
+                    background: n.unread ? '#f8f9ff' : '#fff',
+                    borderBottom: i < notifications.length - 1 ? '1px solid #f0f2f8' : 'none',
+                    transition: 'background .12s' }}
+                    onMouseEnter={e => e.currentTarget.style.background = '#f0f4ff'}
+                    onMouseLeave={e => e.currentTarget.style.background = n.unread ? '#f8f9ff' : '#fff'}>
+                    <div style={{ width: 34, height: 34, borderRadius: '50%', background: '#f5f7fc',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, flexShrink: 0 }}>
+                      {n.icon}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <p style={{ margin: 0, fontSize: 12, color: '#2b3250', lineHeight: 1.4, fontWeight: n.unread ? 600 : 400 }}>{n.text}</p>
+                      <span style={{ fontSize: 11, color: '#b0b6cc' }}>{n.time}</span>
+                    </div>
+                    {n.unread && <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#003087', flexShrink: 0, marginTop: 6 }} />}
+                  </div>
+                ))}
+                <div style={{ padding: '10px 18px', textAlign: 'center', borderTop: '1px solid #ebeef7' }}>
+                  <button onClick={() => setNotifOpen(false)} style={{ fontSize: 12, color: '#003087', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+                    Ver todas las notificaciones
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </header>
 
         {/* View content */}
@@ -246,6 +393,9 @@ function AppShell() {
 
       {/* Toast */}
       {toast && <Toast key={toast.id} message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+
+      {/* Profile Modal */}
+      <ProfileModal open={profileOpen} onClose={() => setProfileOpen(false)} />
     </div>
   );
 }

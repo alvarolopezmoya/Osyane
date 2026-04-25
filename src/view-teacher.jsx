@@ -1,6 +1,70 @@
 
 // ─── Teacher View (Docente) ───────────────────────────────────────────────────
 
+function exportToExcel(students) {
+  const rows = [...students].sort((a,b) => b.xp - a.xp).map((s, i) => {
+    const lvl = getLevelInfo(s.xp);
+    return {
+      'Puesto': i + 1,
+      'Nombre': s.name,
+      'XP Total': s.xp,
+      'Nivel': lvl.n,
+      'Título de Nivel': lvl.title,
+      'Racha (días)': s.streak,
+      'Insignias': s.earnedBadges.length,
+    };
+  });
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  ws['!cols'] = [{ wch: 8 }, { wch: 24 }, { wch: 12 }, { wch: 8 }, { wch: 18 }, { wch: 14 }, { wch: 10 }];
+  XLSX.utils.book_append_sheet(wb, ws, 'Ranking');
+  XLSX.writeFile(wb, 'Osyane_Ranking.xlsx');
+}
+
+function exportToPDF(students) {
+  const sorted = [...students].sort((a,b) => b.xp - a.xp);
+  const rows = sorted.map((s, i) => {
+    const lvl = getLevelInfo(s.xp);
+    return `<tr style="background:${i%2===0?'#fff':'#f7f8fc'}">
+      <td style="padding:7px 12px;text-align:center;font-weight:700;color:#003087">${i+1}</td>
+      <td style="padding:7px 12px;font-weight:600">${s.name}</td>
+      <td style="padding:7px 12px;text-align:right;font-family:monospace;font-weight:700">${s.xp.toLocaleString()}</td>
+      <td style="padding:7px 12px;text-align:center">N${lvl.n}</td>
+      <td style="padding:7px 12px;color:#6b7293">${lvl.title}</td>
+      <td style="padding:7px 12px;text-align:center">${s.streak > 0 ? `🔥 ${s.streak}d` : '—'}</td>
+      <td style="padding:7px 12px;text-align:center">${s.earnedBadges.length}</td>
+    </tr>`;
+  }).join('');
+
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8">
+  <title>Reporte Osyane — FISEI UTA</title>
+  <style>
+    body { font-family: Inter, Arial, sans-serif; color: #0f1320; margin: 32px; }
+    h1 { color: #003087; font-size: 22px; margin: 0 0 4px; }
+    p { color: #6b7293; font-size: 13px; margin: 0 0 24px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead { background: #003087; color: #fff; }
+    th { padding: 10px 12px; text-align: left; font-size: 11px; letter-spacing:.06em; text-transform:uppercase; }
+    .footer { margin-top: 24px; font-size: 11px; color: #9097b5; border-top: 1px solid #e6e8f1; padding-top: 12px; }
+    @media print { @page { margin: 20mm; } }
+  </style></head><body>
+  <h1>Reporte de Rendimiento</h1>
+  <p>Sistema de Gamificación Osyane · FISEI · Universidad Técnica de Ambato · ${new Date().toLocaleDateString('es-EC', {year:'numeric',month:'long',day:'numeric'})}</p>
+  <table>
+    <thead><tr>
+      <th>#</th><th>Estudiante</th><th>XP Total</th><th>Nivel</th><th>Título</th><th>Racha</th><th>Insignias</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+  <div class="footer">Total de estudiantes: ${sorted.length} · Generado desde Osyane MVP</div>
+  <script>window.onload=()=>{window.print();}<\/script>
+  </body></html>`;
+
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+}
+
 function ViewTeacher() {
   const { students, leaderboard, awardXp, awardBadge, showToast } = useApp();
   const [search, setSearch] = React.useState('');
@@ -43,9 +107,19 @@ function ViewTeacher() {
     <div className="rise-in" style={{ padding: 'clamp(14px,3vw,28px) clamp(14px,3vw,32px)', maxWidth: 1100, margin: '0 auto' }}>
 
       {/* Header */}
-      <div style={{ marginBottom: 24 }}>
-        <h1 style={{ margin: '0 0 4px', fontSize: 22, fontWeight: 800, color: '#1b2036' }}>Panel del Docente</h1>
-        <p style={{ margin: 0, fontSize: 13, color: '#9097b5' }}>Gestión de XP e insignias · Ingeniería en Software</p>
+      <div style={{ marginBottom: 24, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+        <div>
+          <h1 style={{ margin: '0 0 4px', fontSize: 22, fontWeight: 800, color: '#1b2036' }}>Panel del Docente</h1>
+          <p style={{ margin: 0, fontSize: 13, color: '#9097b5' }}>Gestión de XP e insignias · Ingeniería en Software</p>
+        </div>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <Btn variant="ghost" size="sm" onClick={() => exportToExcel(students)}>
+            <span>📊</span> Exportar Excel
+          </Btn>
+          <Btn variant="ghost" size="sm" onClick={() => exportToPDF(students)}>
+            <span>📄</span> Exportar PDF
+          </Btn>
+        </div>
       </div>
 
       {/* Stats */}
