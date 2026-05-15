@@ -43,11 +43,12 @@ function LoginScreen({ onLogin }) {
 
         {/* Glass card */}
         <div style={{
-          background: 'rgba(11,17,33,0.92)', backdropFilter: 'blur(24px)',
+          background: DS.card,
+          backdropFilter: 'blur(24px)',
           WebkitBackdropFilter: 'blur(24px)',
           border: `1px solid ${DS.bdMd}`, borderRadius: 24,
           padding: '36px 36px 30px',
-          boxShadow: '0 32px 80px rgba(0,0,0,0.72)'
+          boxShadow: '0 32px 80px rgba(0,0,0,0.5)'
         }}>
 
           {/* Brand */}
@@ -135,11 +136,11 @@ function LoginScreen({ onLogin }) {
                 <button key={s.id} onClick={() => quickLogin(s)} style={{
                   display: 'flex', alignItems: 'center', gap: 12,
                   padding: '10px 14px', borderRadius: 11,
-                  border: `1px solid ${DS.bd}`, background: 'rgba(255,255,255,0.03)',
+                  border: `1px solid ${DS.bd}`, background: DS.card2,
                   cursor: 'pointer', width: '100%', textAlign: 'left', transition: 'all .15s',
                 }}
                 onMouseEnter={(e) => {e.currentTarget.style.background = `${DS.blue}0f`;e.currentTarget.style.borderColor = `${DS.blue}44`;}}
-                onMouseLeave={(e) => {e.currentTarget.style.background = 'rgba(255,255,255,0.03)';e.currentTarget.style.borderColor = DS.bd;}}>
+                onMouseLeave={(e) => {e.currentTarget.style.background = DS.card2;e.currentTarget.style.borderColor = DS.bd;}}>
                   <Avatar initials={s.initials} size={34} colorIndex={parseInt(s.id.slice(1)) - 1} />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 13, fontWeight: 600, color: DS.t1 }}>{s.name}</div>
@@ -221,7 +222,7 @@ function ProfileModal({ open, onClose }) {
           <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 18 }}>
             <Avatar initials={myStudent.initials} size={64} colorIndex={0} glow />
             <div>
-              <div className="head" style={{ fontSize: 19, fontWeight: 800, color: DS.t1, marginBottom: 8, letterSpacing: '-.02em' }}>
+              <div className="head" style={{ fontSize: 19, fontWeight: 800, color: '#e8edf8', marginBottom: 8, letterSpacing: '-.02em' }}>
                 {myStudent.name}
               </div>
               <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
@@ -292,7 +293,7 @@ function AppShell() {
     activeView, setActiveView, myStudent, levelInfo,
     toast, setToast, showRealNames, setShowRealNames,
     notifications, unreadCount, notifOpen, setNotifOpen, markAllRead,
-    logout, userRole, currentTeacher,
+    logout, userRole, currentTeacher, theme, toggleTheme,
   } = useApp();
   const isTeacher = userRole === 'teacher';
   const visibleNav = NAV_ITEMS.filter(item =>
@@ -322,24 +323,22 @@ function AppShell() {
       {/* ── SIDEBAR ── */}
       <aside style={{
         width: sw, flexShrink: 0,
-        background: 'rgba(4,7,16,0.97)',
-        backdropFilter: 'blur(24px)',
-        WebkitBackdropFilter: 'blur(24px)',
-        borderRight: '1px solid rgba(255,255,255,0.05)',
+        background: DS.sidebar,
+        borderRight: `1px solid ${DS.bd}`,
         display: 'flex', flexDirection: 'column',
-        transition: 'width .22s cubic-bezier(.4,0,.2,1), transform .25s ease',
+        transition: 'width .22s cubic-bezier(.4,0,.2,1), transform .25s ease, background .2s',
         overflow: 'hidden',
         ...(isMobile ? {
           position: 'fixed', top: 0, left: 0, bottom: 0, zIndex: 100,
           transform: sideOpen ? 'translateX(0)' : 'translateX(-100%)',
-          boxShadow: sideOpen ? '16px 0 60px rgba(0,0,0,0.7)' : 'none'
-        } : {})
+          boxShadow: sideOpen ? '16px 0 60px rgba(0,0,0,0.4)' : 'none',
+        } : {}),
       }}>
 
         {/* Brand */}
         <div style={{
           padding: collapsed && !isMobile ? '18px 0' : '18px 18px 16px',
-          borderBottom: '1px solid rgba(255,255,255,0.05)',
+          borderBottom: `1px solid ${DS.bd}`,
           display: 'flex', alignItems: 'center',
           justifyContent: collapsed && !isMobile ? 'center' : 'flex-start', gap: 12
         }}>
@@ -362,7 +361,7 @@ function AppShell() {
         {/* Nav */}
         <nav style={{ padding: collapsed && !isMobile ? '12px 8px' : '14px 12px', flex: 1, overflowY: 'auto' }}>
           {(!collapsed || isMobile) &&
-          <div style={{ fontSize: 10, fontWeight: 700, color: DS.t3, letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: 8, paddingLeft: 4 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: DS.t2, letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: 8, paddingLeft: 4 }}>
               Menú
             </div>
           }
@@ -379,9 +378,9 @@ function AppShell() {
           })}
           {(!collapsed || isMobile) &&
           <>
-              <div style={{ fontSize: 10, fontWeight: 700, color: DS.t3, letterSpacing: '.12em', textTransform: 'uppercase', margin: '18px 0 8px', paddingLeft: 4 }}>Opciones</div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: DS.t2, letterSpacing: '.12em', textTransform: 'uppercase', margin: '18px 0 8px', paddingLeft: 4 }}>Opciones</div>
               {isTeacher && (
-                <button onClick={() => setShowRealNames((v) => !v)} className="nav-link" style={{ opacity: .6 }}>
+                <button onClick={() => setShowRealNames((v) => !v)} className="nav-link">
                   <IcoEye size={16} />
                   <span style={{ flex: 1 }}>{showRealNames ? 'Ocultar nombres' : 'Mostrar nombres'}</span>
                 </button>
@@ -391,7 +390,7 @@ function AppShell() {
         </nav>
 
         {/* User card */}
-        <div style={{ padding: collapsed && !isMobile ? '12px 8px' : '14px 14px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ padding: collapsed && !isMobile ? '12px 8px' : '14px 14px', borderTop: `1px solid ${DS.bd}` }}>
           {collapsed && !isMobile ?
           <div style={{ display: 'flex', justifyContent: 'center', cursor: 'pointer' }} onClick={() => !isTeacher && setProfileOpen(true)}>
               <Avatar initials={isTeacher ? currentTeacher?.initials : myStudent.initials} size={34} colorIndex={isTeacher ? 5 : 0} />
@@ -469,10 +468,10 @@ function AppShell() {
         {/* Topbar */}
         <header style={{
           height: 56, flexShrink: 0,
-          background: 'rgba(6,9,18,0.95)',
-          backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: '1px solid rgba(255,255,255,0.055)',
-          display: 'flex', alignItems: 'center', padding: '0 20px', gap: 12
+          background: DS.sidebar,
+          borderBottom: `1px solid ${DS.bd}`,
+          display: 'flex', alignItems: 'center', padding: '0 20px', gap: 12,
+          transition: 'background .2s, border-color .2s',
         }}>
           {isMobile &&
           <button onClick={() => setSideOpen((s) => !s)} style={{
@@ -505,6 +504,18 @@ function AppShell() {
             </div>
           }
           <div style={{ width: 1, height: 24, background: DS.bd }} />
+
+          {/* Theme toggle */}
+          <button onClick={toggleTheme} title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'} style={{
+            width: 36, height: 36, border: `1px solid ${DS.bd}`,
+            borderRadius: 9, background: 'transparent',
+            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: theme === 'dark' ? DS.gold : DS.purple, transition: 'all .2s',
+          }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = theme === 'dark' ? DS.goldDim : 'rgba(124,58,237,0.1)'; e.currentTarget.style.borderColor = theme === 'dark' ? `${DS.gold}55` : 'rgba(124,58,237,0.3)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = DS.bd; }}>
+            {theme === 'dark' ? <IcoSun size={16} /> : <IcoMoon size={16} />}
+          </button>
 
           {/* Bell */}
           <div style={{ position: 'relative' }}>

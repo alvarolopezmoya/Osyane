@@ -280,6 +280,62 @@ button:focus-visible, input:focus-visible {
 .col-span-12{grid-column:span 12/span 12}
 .row-span-2{grid-row:span 2/span 2}
 
+/* ── Light theme overrides ── */
+[data-theme="light"] {
+  --bg:         #f4f6fb;
+  --bg-sidebar: #ffffff;
+  --bg-card:    #ffffff;
+  --bg-card2:   #f8fafc;
+  --bg-input:   #ffffff;
+  --bg-raised:  #eef2f7;
+  --bg-overlay: rgba(255,255,255,0.92);
+
+  --bd:    rgba(15,19,32,0.07);
+  --bd-md: rgba(15,19,32,0.14);
+  --bd-hi: rgba(15,19,32,0.22);
+
+  --t1: #0f1320;
+  --t2: #6b7293;
+  --t3: #a0a7c0;
+  --t4: #cbd2e0;
+
+  --blue:        #3b82f6;
+  --blue-bright: #1d4ed8;
+  --blue-dim:    rgba(59,130,246,0.10);
+  --blue-glow:   rgba(59,130,246,0.28);
+
+  --gold:        #d97706;
+  --gold-bright: #b45309;
+  --gold-dim:    rgba(217,119,6,0.10);
+  --gold-glow:   rgba(217,119,6,0.32);
+
+  --green: #059669;
+  --red:   #dc2626;
+  --purple:#7c3aed;
+}
+[data-theme="light"] body::before {
+  background:
+    radial-gradient(ellipse 70% 55% at 15%  8%, rgba(59,130,246,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 65% at 85% 85%, rgba(124,58,237,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 45% 45% at 55% 45%, rgba(59,130,246,0.03) 0%, transparent 65%);
+}
+[data-theme="light"] *::-webkit-scrollbar-thumb { background: rgba(15,19,32,0.18); }
+[data-theme="light"] .xp-track { background: rgba(15,19,32,0.08); }
+[data-theme="light"] .nav-link:hover { background: rgba(15,19,32,0.04); color: #4a5170; }
+[data-theme="light"] .nav-link.active { color: #1d4ed8; }
+[data-theme="light"] .pill-btn { color: #6b7293; border-color: rgba(15,19,32,0.14); }
+[data-theme="light"] .pill-btn:hover { color: #1d4ed8; border-color: rgba(15,19,32,0.22); }
+[data-theme="light"] .pill-btn.active { color: #1d4ed8; }
+[data-theme="light"] .xp-pick { color: #6b7293; border-color: rgba(15,19,32,0.14); }
+[data-theme="light"] .tab { color: #6b7293; }
+[data-theme="light"] .tab.active { color: #1d4ed8; }
+[data-theme="light"] .tr:hover { background: rgba(15,19,32,0.03) !important; }
+[data-theme="light"] .card { box-shadow: 0 1px 3px rgba(15,19,32,0.05), 0 1px 2px rgba(15,19,32,0.04); }
+[data-theme="light"] .stat-card:hover {
+  box-shadow: 0 10px 30px rgba(15,19,32,0.08) !important;
+  border-color: rgba(15,19,32,0.18) !important;
+}
+
 /* ── Stat card hover (CSS — no React state) ── */
 .stat-card {
   transition: transform .18s cubic-bezier(.4,0,.2,1), box-shadow .18s ease, border-color .18s ease;

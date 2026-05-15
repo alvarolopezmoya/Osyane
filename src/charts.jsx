@@ -7,9 +7,10 @@ const {
 } = Recharts;
 
 const CHART_TICK  = { fontSize: 11, fill: '#5a6a8a', fontFamily: 'JetBrains Mono, monospace' };
-const CHART_TIP   = { background: '#0b1121', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 9, fontSize: 12, fontFamily: 'Inter, sans-serif' };
+const CHART_TIP   = { background: '#0b1121', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 9, fontSize: 12, fontFamily: 'Inter, sans-serif', color: '#e8edf8' };
 const CHART_GRID  = 'rgba(255,255,255,0.05)';
 const CHART_LABEL = { fontWeight: 600, color: '#e8edf8' };
+const CHART_ITEM  = { color: '#e8edf8' };
 
 function XPAreaChart({ data }) {
   return (
@@ -24,7 +25,7 @@ function XPAreaChart({ data }) {
         <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} vertical={false} />
         <XAxis dataKey="week" tick={CHART_TICK} axisLine={false} tickLine={false} />
         <YAxis tick={CHART_TICK} axisLine={false} tickLine={false} />
-        <Tooltip contentStyle={CHART_TIP} labelStyle={CHART_LABEL} formatter={(v) => [`${v} XP`, 'XP ganado']} cursor={{ stroke: 'rgba(255,255,255,0.08)' }} />
+        <Tooltip contentStyle={CHART_TIP} itemStyle={CHART_ITEM} labelStyle={CHART_LABEL} formatter={(v) => [`${v} XP`, 'XP ganado']} cursor={{ stroke: 'rgba(255,255,255,0.08)' }} />
         <Area type="monotone" dataKey="xp" stroke="#f5a623" strokeWidth={2.5}
           fill="url(#xpGrad)" dot={{ r: 3, fill: '#f5a623', strokeWidth: 0 }}
           activeDot={{ r: 5, fill: '#ffcc5c', stroke: '#f5a623', strokeWidth: 2 }} />
@@ -41,7 +42,7 @@ function SubjectBarChart({ data }) {
         <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} vertical={false} />
         <XAxis dataKey="subject" tick={{ ...CHART_TICK, fontFamily: 'Inter, sans-serif' }} axisLine={false} tickLine={false} />
         <YAxis tick={CHART_TICK} axisLine={false} tickLine={false} />
-        <Tooltip contentStyle={CHART_TIP} formatter={(v) => [`${v} XP`, 'XP acumulado']} cursor={{ fill: 'rgba(255,255,255,0.04)' }} />
+        <Tooltip contentStyle={CHART_TIP} itemStyle={CHART_ITEM} formatter={(v) => [`${v} XP`, 'XP acumulado']} cursor={{ fill: 'rgba(255,255,255,0.04)' }} />
         <Bar dataKey="xp" radius={[5, 5, 0, 0]}>
           {data.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
         </Bar>
@@ -112,7 +113,7 @@ function CompetenciasRadar({ data = COMPETENCIAS_DATA, height = 260 }) {
         <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 9, fill: '#2c3a58' }} tickCount={4} axisLine={false} />
         <Radar dataKey="value" stroke="#4f8ef7" strokeWidth={2} fill="#4f8ef7" fillOpacity={0.14}
           dot={{ r: 4, fill: '#f5a623', stroke: '#f5a623', strokeWidth: 0 }} />
-        <Tooltip contentStyle={CHART_TIP} formatter={(v) => [`${v}%`, 'Competencia']} />
+        <Tooltip contentStyle={CHART_TIP} itemStyle={CHART_ITEM} formatter={(v) => [`${v}%`, 'Competencia']} />
       </RadarChart>
     </ResponsiveContainer>
   );

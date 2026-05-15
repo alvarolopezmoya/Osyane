@@ -77,15 +77,15 @@ function DashHero({ myStudent, levelInfo, myRank, leaderboard, xpToNext, earnedB
             margin: '0 0 3px', fontSize: 'clamp(20px,2.5vw,30px)',
             fontWeight: 800, color: '#e8edf8', letterSpacing: '-.025em', lineHeight: 1.1,
           }}>{myStudent.name}</h1>
-          <p style={{ margin: '0 0 16px', fontSize: 12, color: DS.t2, display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+          <p style={{ margin: '0 0 16px', fontSize: 12, color: '#94a3b8', display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
             <span>#{myRank} de {leaderboard.length}</span>
             <span style={{ opacity: 0.3 }}>·</span>
             <span>Ing. en Software · FISEI · UTA</span>
           </p>
           <div style={{ maxWidth: 480 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-              <span style={{ fontSize: 11, color: DS.t2, letterSpacing: '.04em' }}>→ NIVEL {levelInfo.n + 1}</span>
-              <span className="num" style={{ fontSize: 11, fontWeight: 700, color: DS.gold }}>
+              <span style={{ fontSize: 11, color: '#94a3b8', letterSpacing: '.04em' }}>→ NIVEL {levelInfo.n + 1}</span>
+              <span className="num" style={{ fontSize: 11, fontWeight: 700, color: '#f5a623' }}>
                 {levelInfo.max !== Infinity ? `${xpToNext.toLocaleString()} XP restantes` : '✦ Nivel máximo'}
               </span>
             </div>
@@ -95,11 +95,11 @@ function DashHero({ myStudent, levelInfo, myRank, leaderboard, xpToNext, earnedB
 
         {/* Big XP number */}
         <div style={{ textAlign: 'right', flexShrink: 0 }}>
-          <div style={{ fontSize: 10, color: DS.t3, letterSpacing: '.14em', textTransform: 'uppercase', marginBottom: 4 }}>XP Total</div>
+          <div style={{ fontSize: 10, color: '#64748b', letterSpacing: '.14em', textTransform: 'uppercase', marginBottom: 4 }}>XP Total</div>
           <div className="num grad-text-gold" style={{ fontSize: 'clamp(36px,4vw,52px)', fontWeight: 900, lineHeight: 1 }}>
             {myStudent.xp.toLocaleString()}
           </div>
-          <div style={{ fontSize: 11, color: DS.t3, marginTop: 6, display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+          <div style={{ fontSize: 11, color: '#64748b', marginTop: 6, display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
             <span>{earnedBadges.length} insignias</span>
             <span>·</span>
             <span>{myStudent.streak}d racha</span>

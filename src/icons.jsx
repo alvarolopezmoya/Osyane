@@ -36,10 +36,14 @@ const IcoAward = ({ size, className }) => <Icon size={size} className={className
 const IcoClose = ({ size, className }) => <Icon size={size} className={className} d="M18 6L6 18M6 6l12 12"/>;
 const IcoGift = ({ size, className }) => <Icon size={size} className={className} d="M20 12v10H4V12M22 7H2v5h20V7zM12 22V7m0-5a2.5 2.5 0 00-5 0c0 2.76 5 5 5 5s5-2.24 5-5a2.5 2.5 0 00-5 0z"/>;
 const IcoMenu = ({ size, className }) => <Icon size={size} className={className} d="M3 12h18M3 6h18M3 18h18"/>;
+const IcoSun = ({ size, className }) => <Icon size={size} className={className} d={
+  <><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"/></>
+} />;
+const IcoMoon = ({ size, className }) => <Icon size={size} className={className} d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor" />;
 
 Object.assign(window, {
   Icon, IcoDashboard, IcoRanking, IcoBadge, IcoProgress, IcoTeacher,
   IcoBell, IcoEye, IcoChevron, IcoSearch, IcoPlus, IcoCheck, IcoStar,
   IcoTrophy, IcoFlame, IcoArrowUp, IcoArrowDown, IcoXp, IcoAward,
-  IcoClose, IcoGift, IcoMenu,
+  IcoClose, IcoGift, IcoMenu, IcoSun, IcoMoon,
 });

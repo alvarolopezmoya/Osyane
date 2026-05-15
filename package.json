@@ -14,13 +14,13 @@
   ],
   "author": "Osyan Granda <ogranda8821@uta.edu.ec>",
   "license": "MIT",
-  "homepage": "https://github.com/YOUR_USER/osyanne",
+  "homepage": "https://github.com/alvarolopezmoya/Osyane",
   "repository": {
     "type": "git",
-    "url": "https://github.com/YOUR_USER/osyanne.git"
+    "url": "https://github.com/alvarolopezmoya/Osyane.git"
   },
   "bugs": {
-    "url": "https://github.com/YOUR_USER/osyanne/issues"
+    "url": "https://github.com/alvarolopezmoya/Osyane/issues"
   },
   "scripts": {
     "start": "npx http-server -p 8080 -o",
