@@ -47,21 +47,21 @@ const SUBJECTS = [
 ];
 
 const STUDENTS = [
-  { id: 'u01', name: 'Osyan Granda',       initials: 'OG', xp: 4580, earnedBadges: ['b01','b02','b03','b05','b06','b08','b10'], streak: 12, isMe: true  },
-  { id: 'u02', name: 'Valentina Torres',   initials: 'VT', xp: 5210, earnedBadges: ['b01','b02','b04','b05','b06','b07','b09','b11'], streak: 18, isMe: false },
-  { id: 'u03', name: 'Sebastián Mora',     initials: 'SM', xp: 4990, earnedBadges: ['b01','b03','b06','b10','b13'], streak: 9,  isMe: false },
-  { id: 'u04', name: 'Camila Reyes',       initials: 'CR', xp: 4120, earnedBadges: ['b01','b02','b04','b08','b11'], streak: 22, isMe: false },
-  { id: 'u05', name: 'Diego Almeida',      initials: 'DA', xp: 3850, earnedBadges: ['b01','b05','b12'], streak: 5,  isMe: false },
-  { id: 'u06', name: 'Lucía Vargas',       initials: 'LV', xp: 3740, earnedBadges: ['b01','b02','b03','b09'], streak: 14, isMe: false },
-  { id: 'u07', name: 'Mateo Salazar',      initials: 'MS', xp: 3510, earnedBadges: ['b01','b04'], streak: 3,  isMe: false },
-  { id: 'u08', name: 'Isabella Peña',      initials: 'IP', xp: 3290, earnedBadges: ['b01','b02','b05'], streak: 7,  isMe: false },
-  { id: 'u09', name: 'Andrés Flores',      initials: 'AF', xp: 3010, earnedBadges: ['b01','b11'], streak: 2,  isMe: false },
-  { id: 'u10', name: 'Sofía Mendoza',      initials: 'SF', xp: 2870, earnedBadges: ['b01','b02'], streak: 11, isMe: false },
-  { id: 'u11', name: 'Carlos Jiménez',     initials: 'CJ', xp: 2640, earnedBadges: ['b01'], streak: 4,  isMe: false },
-  { id: 'u12', name: 'Paula Ortega',       initials: 'PO', xp: 2380, earnedBadges: ['b01','b04'], streak: 6,  isMe: false },
-  { id: 'u13', name: 'Rafael Castro',      initials: 'RC', xp: 2210, earnedBadges: ['b01'], streak: 1,  isMe: false },
-  { id: 'u14', name: 'Natalia Ríos',       initials: 'NR', xp: 1940, earnedBadges: ['b01'], streak: 8,  isMe: false },
-  { id: 'u15', name: 'Héctor Muñoz',       initials: 'HM', xp: 1650, earnedBadges: ['b01'], streak: 0,  isMe: false },
+  { id: 'u01', name: 'Osyan Granda',     initials: 'OG', email: 'ogranda8821@uta.edu.ec', xp: 4580, earnedBadges: ['b01','b02','b03','b05','b06','b08','b10'], streak: 12, isMe: true  },
+  { id: 'u02', name: 'Valentina Torres', initials: 'VT', email: 'vtorres5543@uta.edu.ec', xp: 5210, earnedBadges: ['b01','b02','b04','b05','b06','b07','b09','b11'], streak: 18, isMe: false },
+  { id: 'u03', name: 'Sebastián Mora',   initials: 'SM', email: 'smora6612@uta.edu.ec',   xp: 4990, earnedBadges: ['b01','b03','b06','b10','b13'], streak: 9,  isMe: false },
+  { id: 'u04', name: 'Camila Reyes',     initials: 'CR', email: 'creyes7731@uta.edu.ec',  xp: 4120, earnedBadges: ['b01','b02','b04','b08','b11'], streak: 22, isMe: false },
+  { id: 'u05', name: 'Diego Almeida',    initials: 'DA', email: 'dalmeida4423@uta.edu.ec',xp: 3850, earnedBadges: ['b01','b05','b12'], streak: 5,  isMe: false },
+  { id: 'u06', name: 'Lucía Vargas',     initials: 'LV', email: 'lvargas3312@uta.edu.ec', xp: 3740, earnedBadges: ['b01','b02','b03','b09'], streak: 14, isMe: false },
+  { id: 'u07', name: 'Mateo Salazar',    initials: 'MS', email: 'msalazar8821@uta.edu.ec',xp: 3510, earnedBadges: ['b01','b04'], streak: 3,  isMe: false },
+  { id: 'u08', name: 'Isabella Peña',    initials: 'IP', email: 'ipena9934@uta.edu.ec',   xp: 3290, earnedBadges: ['b01','b02','b05'], streak: 7,  isMe: false },
+  { id: 'u09', name: 'Andrés Flores',    initials: 'AF', email: 'aflores2243@uta.edu.ec', xp: 3010, earnedBadges: ['b01','b11'], streak: 2,  isMe: false },
+  { id: 'u10', name: 'Sofía Mendoza',    initials: 'SF', email: 'smendoza1198@uta.edu.ec',xp: 2870, earnedBadges: ['b01','b02'], streak: 11, isMe: false },
+  { id: 'u11', name: 'Carlos Jiménez',   initials: 'CJ', email: 'cjimenez6647@uta.edu.ec',xp: 2640, earnedBadges: ['b01'], streak: 4,  isMe: false },
+  { id: 'u12', name: 'Paula Ortega',     initials: 'PO', email: 'portega3356@uta.edu.ec', xp: 2380, earnedBadges: ['b01','b04'], streak: 6,  isMe: false },
+  { id: 'u13', name: 'Rafael Castro',    initials: 'RC', email: 'rcastro7782@uta.edu.ec', xp: 2210, earnedBadges: ['b01'], streak: 1,  isMe: false },
+  { id: 'u14', name: 'Natalia Ríos',     initials: 'NR', email: 'nrios4421@uta.edu.ec',   xp: 1940, earnedBadges: ['b01'], streak: 8,  isMe: false },
+  { id: 'u15', name: 'Héctor Muñoz',     initials: 'HM', email: 'hmunoz9913@uta.edu.ec',  xp: 1650, earnedBadges: ['b01'], streak: 0,  isMe: false },
 ];
 
 const XP_HISTORY = [
@@ -88,4 +88,9 @@ const ACTIVITY_FEED = [
   { id: 'a6', type: 'xp',    icon: '⚡', text: 'Ganaste 200 XP en proyecto "API REST"',         time: 'hace 3 d',  xp: +200 },
 ];
 
-Object.assign(window, { LEVELS, BADGES, SUBJECTS, STUDENTS, XP_HISTORY, SUBJECT_XP, ACTIVITY_FEED, getLevelInfo });
+const TEACHERS = [
+  { id: 't01', name: 'Dr. Carlos Pinto',    initials: 'CP', email: 'cpinto@uta.edu.ec',    role: 'teacher' },
+  { id: 't02', name: 'Ing. María Salinas',  initials: 'MS', email: 'msalinas@uta.edu.ec',  role: 'teacher' },
+];
+
+Object.assign(window, { LEVELS, BADGES, SUBJECTS, STUDENTS, TEACHERS, XP_HISTORY, SUBJECT_XP, ACTIVITY_FEED, getLevelInfo });

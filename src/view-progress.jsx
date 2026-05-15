@@ -1,7 +1,31 @@
+// ─── Progress View — Premium ──────────────────────────────────────────────────
 
-// ─── Progress View ────────────────────────────────────────────────────────────
+// SVG circular progress ring
+function RingProgress({ progress, size = 88, stroke = 7, color = '#4f8ef7', label, sub }) {
+  const r = (size - stroke) / 2;
+  const circ = 2 * Math.PI * r;
+  const dash = circ * Math.min(progress, 1);
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+      <div style={{ position: 'relative', width: size, height: size }}>
+        <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
+          <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth={stroke} />
+          <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={stroke}
+            strokeDasharray={`${dash} ${circ - dash}`} strokeLinecap="round"
+            style={{ transition: 'stroke-dasharray 1s cubic-bezier(.4,0,.2,1)', filter: `drop-shadow(0 0 6px ${color}88)` }} />
+        </svg>
+        {label && (
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span className="num" style={{ fontSize: 14, fontWeight: 800, color: DS.t1 }}>{label}</span>
+          </div>
+        )}
+      </div>
+      {sub && <span style={{ fontSize: 11, color: DS.t2, textAlign: 'center' }}>{sub}</span>}
+    </div>
+  );
+}
 
-// Streak calendar — last 10 weeks (70 days)
+// Streak calendar
 function StreakCalendar({ streak }) {
   const days = 70;
   const today = new Date();
@@ -10,27 +34,30 @@ function StreakCalendar({ streak }) {
     d.setDate(today.getDate() - (days - 1 - i));
     const daysAgo = days - 1 - i;
     const active = daysAgo < streak ? true : (Math.random() > 0.45 && daysAgo < streak + 12);
-    return { date: d, active, intensity: active ? (Math.random() > 0.6 ? 'high' : 'med') : 'none' };
+    return { date: d, active, intensity: active ? (Math.random() > 0.55 ? 'high' : 'med') : 'none' };
   });
   const weeks = [];
   for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
-  const intensityColors = { none: '#ebeef7', med: '#93aee8', high: '#003087' };
+  const intensityColors = { none: 'rgba(255,255,255,0.06)', med: '#1d4ed8', high: '#4f8ef7' };
   return (
     <div>
       <div style={{ display: 'flex', gap: 4 }}>
         {weeks.map((week, wi) => (
           <div key={wi} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             {week.map((day, di) => (
-              <div key={di} title={day.date.toLocaleDateString('es-EC')}
-                style={{ width: 12, height: 12, borderRadius: 3, background: intensityColors[day.intensity],
-                  transition: 'transform .1s' }}
+              <div key={di} title={day.date.toLocaleDateString('es-EC')} style={{
+                width: 12, height: 12, borderRadius: 3,
+                background: intensityColors[day.intensity],
+                boxShadow: day.intensity === 'high' ? '0 0 6px rgba(79,142,247,0.5)' : 'none',
+                transition: 'transform .1s',
+              }}
                 onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.4)'}
                 onMouseLeave={e => e.currentTarget.style.transform = ''} />
             ))}
           </div>
         ))}
       </div>
-      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 10, fontSize: 10, color: '#9097b5' }}>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 10, fontSize: 10, color: DS.t2 }}>
         <span>Menos</span>
         {['none','med','high'].map(k => (
           <div key={k} style={{ width: 10, height: 10, borderRadius: 2, background: intensityColors[k] }} />
@@ -41,44 +68,36 @@ function StreakCalendar({ streak }) {
   );
 }
 
-// Grade comparison bars
 const GRADES = [
-  { subject: 'Prog. OO',    myGrade: 9.2, avgGrade: 7.8, maxGrade: 10 },
-  { subject: 'Base Datos',  myGrade: 8.5, avgGrade: 7.2, maxGrade: 10 },
-  { subject: 'Redes',       myGrade: 7.8, avgGrade: 7.5, maxGrade: 10 },
-  { subject: 'Ing. SW',     myGrade: 8.9, avgGrade: 8.1, maxGrade: 10 },
-  { subject: 'Cálculo',     myGrade: 7.1, avgGrade: 6.8, maxGrade: 10 },
+  { subject: 'Prog. OO',   myGrade: 9.2, avgGrade: 7.8, maxGrade: 10 },
+  { subject: 'Base Datos', myGrade: 8.5, avgGrade: 7.2, maxGrade: 10 },
+  { subject: 'Redes',      myGrade: 7.8, avgGrade: 7.5, maxGrade: 10 },
+  { subject: 'Ing. SW',    myGrade: 8.9, avgGrade: 8.1, maxGrade: 10 },
+  { subject: 'Cálculo',    myGrade: 7.1, avgGrade: 6.8, maxGrade: 10 },
 ];
 
 function GradeComparison() {
+  const COLORS = ['#4f8ef7','#0fd9a0','#f5a623','#a78bfa','#f43f5e'];
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
       {GRADES.map((g, i) => (
         <div key={i}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-            <span style={{ fontSize: 13, fontWeight: 600, color: '#2b3250' }}>{g.subject}</span>
-            <div style={{ display: 'flex', gap: 12, fontSize: 12, fontFamily: 'JetBrains Mono, monospace' }}>
-              <span style={{ color: '#003087', fontWeight: 700 }}>Tú: {g.myGrade}</span>
-              <span style={{ color: '#9097b5' }}>Prom: {g.avgGrade}</span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+            <span style={{ fontSize: 13, fontWeight: 600, color: DS.t1 }}>{g.subject}</span>
+            <div style={{ display: 'flex', gap: 14, fontSize: 12 }}>
+              <span className="num" style={{ color: COLORS[i], fontWeight: 700 }}>Tú: {g.myGrade}</span>
+              <span className="num" style={{ color: DS.t2 }}>Prom: {g.avgGrade}</span>
             </div>
           </div>
-          <div style={{ position: 'relative', height: 10, background: '#ebeef7', borderRadius: 99, overflow: 'hidden' }}>
-            {/* avg bar */}
-            <div style={{ position: 'absolute', height: '100%', width: `${(g.avgGrade/g.maxGrade)*100}%`, background: '#c0c5da', borderRadius: 99 }} />
-            {/* my bar */}
-            <div style={{ position: 'absolute', height: '100%', width: `${(g.myGrade/g.maxGrade)*100}%`,
-              background: g.myGrade >= g.avgGrade ? '#003087' : '#b87d00', borderRadius: 99,
-              transition: 'width .8s ease', opacity: 0.9 }} />
+          <div style={{ position: 'relative', height: 8, background: 'rgba(255,255,255,0.07)', borderRadius: 99, overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', height: '100%', width: `${(g.avgGrade/g.maxGrade)*100}%`, background: 'rgba(255,255,255,0.15)', borderRadius: 99 }} />
+            <div style={{ position: 'absolute', height: '100%', width: `${(g.myGrade/g.maxGrade)*100}%`, background: COLORS[i], borderRadius: 99, boxShadow: `0 0 10px ${COLORS[i]}55`, transition: 'width .8s ease' }} />
           </div>
         </div>
       ))}
-      <div style={{ display: 'flex', gap: 16, fontSize: 11, color: '#9097b5' }}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ width: 12, height: 6, background: '#003087', borderRadius: 3, display: 'inline-block' }} /> Tu nota
-        </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ width: 12, height: 6, background: '#c0c5da', borderRadius: 3, display: 'inline-block' }} /> Promedio grupo
-        </span>
+      <div style={{ display: 'flex', gap: 16, fontSize: 11, color: DS.t2 }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ width: 10, height: 4, background: DS.blue, borderRadius: 3, display: 'inline-block' }} /> Tu nota</span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ width: 10, height: 4, background: 'rgba(255,255,255,0.15)', borderRadius: 3, display: 'inline-block' }} /> Promedio</span>
       </div>
     </div>
   );
@@ -87,8 +106,8 @@ function GradeComparison() {
 function ViewProgress() {
   const { myStudent, levelInfo } = useApp();
   const [tab, setTab] = React.useState('xp');
-  const totalXpEarned = XP_HISTORY.reduce((a, b) => a + b.xp, 0);
-  const avgXpPerWeek = Math.round(totalXpEarned / XP_HISTORY.length);
+  const totalXp = XP_HISTORY.reduce((a, b) => a + b.xp, 0);
+  const avgXp   = Math.round(totalXp / XP_HISTORY.length);
   const bestWeek = XP_HISTORY.reduce((a, b) => a.xp > b.xp ? a : b);
   const tabs = [
     { id: 'xp',      label: 'XP semanal' },
@@ -96,43 +115,45 @@ function ViewProgress() {
     { id: 'grades',  label: 'Calificaciones' },
     { id: 'levels',  label: 'Niveles' },
   ];
+  const C = { background: DS.card, border: `1px solid ${DS.bd}`, borderRadius: 16, boxShadow: '0 4px 20px rgba(0,0,0,0.38)' };
 
   return (
-    <div className="rise-in" style={{ padding: 'clamp(14px,3vw,28px) clamp(14px,3vw,32px)', maxWidth: 1100, margin: '0 auto' }}>
+    <div className="rise-in" style={{ padding: 'clamp(14px,3vw,28px)', maxWidth: 1140, margin: '0 auto' }}>
 
       {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px,1fr))', gap: 14, marginBottom: 22 }}>
-        <StatCard label="XP Acumulado" value={myStudent.xp.toLocaleString()} sub="Total histórico" icon={<IcoXp size={18} />} accent="#FFB800" />
-        <StatCard label="Promedio semanal" value={`${avgXpPerWeek} XP`} sub="Por semana" icon={<IcoProgress size={18} />} accent="#1a56c4" />
-        <StatCard label="Mejor semana" value={`${bestWeek.xp} XP`} sub={bestWeek.week} icon={<IcoStar size={18} />} accent="#b87d00" />
-        <StatCard label="Nivel actual" value={`N${levelInfo.n}`} sub={levelInfo.title} icon={<IcoAward size={18} />} accent="#003087" />
-        <StatCard label="Nota promedio" value="8.3" sub="Sobre 10 en todas las materias" icon={<IcoCheck size={18} />} accent="#1f7a4a" />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(170px,1fr))', gap: 14, marginBottom: 18 }}>
+        {[
+          { label: 'XP Acumulado',     value: myStudent.xp.toLocaleString(), sub: 'Total histórico',    icon: <IcoXp size={16} />,      accent: DS.gold   },
+          { label: 'Promedio semanal', value: `${avgXp}`,                    sub: 'XP por semana',      icon: <IcoProgress size={16} />, accent: DS.blue   },
+          { label: 'Mejor semana',     value: `${bestWeek.xp}`,              sub: bestWeek.week,        icon: <IcoStar size={16} />,     accent: DS.purple },
+          { label: 'Nivel actual',     value: `N${levelInfo.n}`,             sub: levelInfo.title,      icon: <IcoAward size={16} />,    accent: DS.blue   },
+          { label: 'Nota promedio',    value: '8.3',                         sub: 'Sobre 10 · todas',   icon: <IcoCheck size={16} />,    accent: DS.green  },
+        ].map((s, i) => (
+          <div key={i} className={`float-up d${i+1}`}>
+            <StatCard label={s.label} value={s.value} sub={s.sub} icon={s.icon} accent={s.accent} />
+          </div>
+        ))}
       </div>
 
-      {/* Two-column top: level progress + streak calendar */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: 18, marginBottom: 18 }}>
+      {/* Level + Streak */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: 16, marginBottom: 16 }}>
 
-        {/* Level progress */}
-        <div style={{ background: '#fff', border: '1px solid #e6e8f1', borderRadius: 12, padding: '20px' }}>
+        {/* Level progress with rings */}
+        <div style={{ ...C, padding: 22 }}>
           <SectionHeader title="Progreso de nivel" sub={`Nivel ${levelInfo.n} · ${levelInfo.title}`} />
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
-            <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#003087', flexShrink: 0,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 16, fontWeight: 900, color: '#FFB800', fontFamily: 'JetBrains Mono, monospace' }}>
-              N{levelInfo.n}
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 18 }}>
+            <RingProgress progress={levelInfo.progress} size={90} stroke={7} color={DS.gold}
+              label={`N${levelInfo.n}`} sub="Nivel" />
             <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-                <span style={{ fontSize: 12, color: '#6b7293' }}>{levelInfo.min.toLocaleString()} XP</span>
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#003087', fontFamily: 'JetBrains Mono, monospace' }}>
-                  {myStudent.xp.toLocaleString()} ({Math.round(levelInfo.progress * 100)}%)
-                </span>
-                <span style={{ fontSize: 12, color: '#6b7293' }}>{levelInfo.max !== Infinity ? `${levelInfo.max.toLocaleString()}` : '∞'}</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: 11, color: DS.t2 }}>
+                <span className="num">{levelInfo.min.toLocaleString()} XP</span>
+                <span className="num" style={{ color: DS.goldBright, fontWeight: 700 }}>{myStudent.xp.toLocaleString()} ({Math.round(levelInfo.progress*100)}%)</span>
+                <span className="num">{levelInfo.max !== Infinity ? levelInfo.max.toLocaleString() : '∞'}</span>
               </div>
-              <XPBar progress={levelInfo.progress} height={10} />
+              <XPBar progress={levelInfo.progress} height={9} />
               {levelInfo.max !== Infinity && (
-                <div style={{ fontSize: 11, color: '#9097b5', marginTop: 5 }}>
-                  Faltan {(levelInfo.max - myStudent.xp).toLocaleString()} XP para el siguiente nivel
+                <div style={{ fontSize: 11, color: DS.t2, marginTop: 6 }}>
+                  Faltan {(levelInfo.max - myStudent.xp).toLocaleString()} XP → Nivel {levelInfo.n + 1}
                 </div>
               )}
             </div>
@@ -140,55 +161,53 @@ function ViewProgress() {
           {/* Level dots */}
           <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
             {LEVELS.map(l => {
-              const done = myStudent.xp >= l.max;
+              const done    = myStudent.xp >= l.max;
               const current = levelInfo.n === l.n;
               return (
-                <div key={l.n} title={l.title} style={{ width: 30, height: 30, borderRadius: '50%',
-                  background: done ? '#003087' : current ? '#FFB800' : '#ebeef7',
+                <div key={l.n} title={l.title} style={{
+                  width: 30, height: 30, borderRadius: '50%',
+                  background: done ? 'linear-gradient(135deg,#1d4ed8,#4f8ef7)' : current ? 'linear-gradient(135deg,#b45309,#f59e0b)' : DS.card2,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 10, fontWeight: 800, fontFamily: 'JetBrains Mono, monospace',
-                  color: done ? '#FFB800' : current ? '#2a1a00' : '#9097b5',
-                  border: current ? '2px solid #FFB800' : '2px solid transparent' }}>
-                  {l.n}
-                </div>
+                  color: done ? '#e0e7ff' : current ? '#fff' : DS.t3,
+                  border: current ? `2px solid ${DS.gold}` : '2px solid transparent',
+                  boxShadow: current ? `0 0 12px ${DS.goldGlow}` : done ? '0 0 8px rgba(79,142,247,0.3)' : 'none',
+                  transition: 'all .2s',
+                }}>{l.n}</div>
               );
             })}
           </div>
         </div>
 
         {/* Streak calendar */}
-        <div style={{ background: '#fff', border: '1px solid #e6e8f1', borderRadius: 12, padding: '20px' }}>
+        <div style={{ ...C, padding: 22 }}>
           <SectionHeader title="Consistencia — últimas 10 semanas" sub={`Racha actual: ${myStudent.streak} días 🔥`} />
           <StreakCalendar streak={myStudent.streak} />
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginTop: 16 }}>
             {[
-              { label: 'Racha actual', value: `${myStudent.streak}d` },
-              { label: 'Mejor racha', value: '22d' },
-              { label: 'Días activos', value: '47' },
+              { label: 'Racha actual', value: `${myStudent.streak}d`, color: DS.gold },
+              { label: 'Mejor racha',  value: '22d',  color: DS.blue   },
+              { label: 'Días activos', value: '47',   color: DS.green  },
             ].map((s, i) => (
-              <div key={i} style={{ background: '#f5f7fc', borderRadius: 8, padding: '8px 10px', textAlign: 'center' }}>
-                <div style={{ fontSize: 16, fontWeight: 800, color: '#1b2036', fontFamily: 'JetBrains Mono, monospace' }}>{s.value}</div>
-                <div style={{ fontSize: 10, color: '#9097b5', marginTop: 2 }}>{s.label}</div>
+              <div key={i} style={{ background: DS.card2, border: `1px solid ${DS.bd}`, borderRadius: 10, padding: '10px', textAlign: 'center' }}>
+                <div className="num" style={{ fontSize: 17, fontWeight: 800, color: s.color }}>{s.value}</div>
+                <div style={{ fontSize: 10, color: DS.t2, marginTop: 3 }}>{s.label}</div>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Tabs: charts */}
-      <div style={{ background: '#fff', border: '1px solid #e6e8f1', borderRadius: 12, overflow: 'hidden', marginBottom: 18 }}>
-        <div style={{ display: 'flex', borderBottom: '1px solid #e6e8f1', overflowX: 'auto' }}>
+      {/* Tabbed charts */}
+      <div style={{ ...C, overflow: 'hidden', marginBottom: 16 }}>
+        <div style={{ display: 'flex', borderBottom: `1px solid ${DS.bd}`, overflowX: 'auto' }}>
           {tabs.map(t => (
-            <button key={t.id} onClick={() => setTab(t.id)}
-              style={{ padding: '12px 20px', border: 'none', background: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
-                fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 600,
-                color: tab === t.id ? '#003087' : '#9097b5',
-                borderBottom: `2px solid ${tab === t.id ? '#003087' : 'transparent'}` }}>
+            <button key={t.id} onClick={() => setTab(t.id)} className={`tab${tab === t.id ? ' active' : ''}`}>
               {t.label}
             </button>
           ))}
         </div>
-        <div style={{ padding: '20px' }}>
+        <div style={{ padding: 20 }}>
           {tab === 'xp' && (
             <>
               <SectionHeader title="XP ganado por semana" sub="Últimas 12 semanas del semestre" />
@@ -204,7 +223,7 @@ function ViewProgress() {
           )}
           {tab === 'grades' && (
             <>
-              <SectionHeader title="Calificaciones vs. promedio" sub="Tu rendimiento comparado con el grupo" />
+              <SectionHeader title="Calificaciones vs. promedio" sub="Tu rendimiento vs. el grupo" />
               <GradeComparison />
             </>
           )}
@@ -212,32 +231,33 @@ function ViewProgress() {
             <div>
               <SectionHeader title="Tabla de niveles" sub="Requisitos de XP por nivel" />
               {LEVELS.map((l, i) => {
-                const done = myStudent.xp >= l.max;
+                const done    = myStudent.xp >= l.max;
                 const current = levelInfo.n === l.n;
                 return (
-                  <div key={l.n} style={{ display: 'grid', gridTemplateColumns: '36px 160px 1fr 130px',
-                    alignItems: 'center', gap: 12, padding: '10px 0',
-                    borderBottom: i < LEVELS.length - 1 ? '1px dashed #ebeef7' : 'none',
-                    background: current ? '#fffaec' : 'transparent',
-                    paddingLeft: current ? 8 : 0, borderRadius: current ? 8 : 0 }}>
-                    <div style={{ width: 30, height: 30, borderRadius: '50%',
-                      background: done ? '#003087' : current ? '#FFB800' : '#ebeef7',
+                  <div key={l.n} style={{
+                    display: 'grid', gridTemplateColumns: '36px 160px 1fr 130px',
+                    alignItems: 'center', gap: 12, padding: '10px 8px',
+                    borderBottom: i < LEVELS.length-1 ? `1px dashed ${DS.bd}` : 'none',
+                    background: current ? `${DS.gold}0a` : 'transparent',
+                    borderRadius: current ? 8 : 0,
+                    marginBottom: current ? 2 : 0,
+                  }}>
+                    <div style={{
+                      width: 30, height: 30, borderRadius: '50%',
+                      background: done ? 'linear-gradient(135deg,#1d4ed8,#4f8ef7)' : current ? 'linear-gradient(135deg,#b45309,#f59e0b)' : DS.card2,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 11, fontWeight: 800, fontFamily: 'JetBrains Mono, monospace',
-                      color: done ? '#FFB800' : current ? '#2a1a00' : '#9097b5' }}>
-                      N{l.n}
-                    </div>
-                    <span style={{ fontSize: 13, fontWeight: current ? 700 : 500, color: current ? '#1b2036' : '#4a5170' }}>
+                      fontSize: 10, fontWeight: 800, fontFamily: 'JetBrains Mono,monospace',
+                      color: done ? '#e0e7ff' : current ? '#fff' : DS.t3,
+                    }}>N{l.n}</div>
+                    <span style={{ fontSize: 13, fontWeight: current ? 700 : 400, color: current ? DS.t1 : DS.t2 }}>
                       {l.title}
-                      {current && <span style={{ marginLeft: 6, fontSize: 9, background: '#FFB800', color: '#2a1a00', borderRadius: 4, padding: '1px 5px', fontWeight: 700 }}>ACTUAL</span>}
+                      {current && <span style={{ marginLeft: 7, fontSize: 9, background: DS.gold, color: '#fff', borderRadius: 4, padding: '1px 5px', fontWeight: 800, letterSpacing: '.04em' }}>ACTUAL</span>}
                     </span>
-                    <div style={{ fontSize: 12, color: '#9097b5', fontFamily: 'JetBrains Mono, monospace' }}>
-                      {l.min.toLocaleString()} — {l.max === Infinity ? '∞' : l.max.toLocaleString()} XP
-                    </div>
+                    <span className="num" style={{ fontSize: 11, color: DS.t2 }}>{l.min.toLocaleString()} — {l.max === Infinity ? '∞' : l.max.toLocaleString()} XP</span>
                     <div style={{ textAlign: 'right' }}>
-                      {done && !current && <span style={{ color: '#1f7a4a', fontSize: 12, fontWeight: 700 }}>✓ Completado</span>}
-                      {current && <span style={{ color: '#b87d00', fontSize: 12, fontWeight: 700 }}>⚡ En progreso</span>}
-                      {!done && !current && <span style={{ color: '#c0c5da', fontSize: 12 }}>Bloqueado</span>}
+                      {done && !current && <span style={{ color: DS.green, fontSize: 12, fontWeight: 700 }}>✓ Completado</span>}
+                      {current && <span style={{ color: DS.gold, fontSize: 12, fontWeight: 700 }}>⚡ En progreso</span>}
+                      {!done && !current && <span style={{ color: DS.t3, fontSize: 12 }}>Bloqueado</span>}
                     </div>
                   </div>
                 );

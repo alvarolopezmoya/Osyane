@@ -1,5 +1,56 @@
-node_modules/
+# ─── Sistemas operativos ───────────────────────────────
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+desktop.ini
+
+# ─── Editores e IDEs ───────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# ─── Logs y temporales ─────────────────────────────────
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+*.tmp
+*.bak
+*.backup
+
+# ─── Node (por si en el futuro se añade build) ─────────
+node_modules/
+dist/
+build/
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.vite/
+
+# ─── Variables de entorno ──────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ─── Coverage y reportes ───────────────────────────────
+coverage/
+*.lcov
+.nyc_output/
+
+# ─── Específicos del proyecto ──────────────────────────
 uploads/
+scraps/
+*.napkin

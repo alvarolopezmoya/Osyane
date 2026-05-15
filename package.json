@@ -1,0 +1,30 @@
+{
+  "name": "osyanne",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sistema de Gamificación Académica para FISEI · UTA — niveles, XP, insignias y rankings",
+  "keywords": [
+    "gamification",
+    "education",
+    "react",
+    "uta",
+    "fisei",
+    "dashboard",
+    "edtech"
+  ],
+  "author": "Osyan Granda <ogranda8821@uta.edu.ec>",
+  "license": "MIT",
+  "homepage": "https://github.com/YOUR_USER/osyanne",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR_USER/osyanne.git"
+  },
+  "bugs": {
+    "url": "https://github.com/YOUR_USER/osyanne/issues"
+  },
+  "scripts": {
+    "start": "npx http-server -p 8080 -o",
+    "dev": "npx http-server -p 8080 -o",
+    "serve": "python3 -m http.server 8080"
+  }
+}
