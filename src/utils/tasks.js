@@ -28,13 +28,15 @@ export function validateTask(task) {
   return { ok: Object.keys(errors).length === 0, errors };
 }
 
-// Días restantes hasta el deadline. Cuando se vence, devuelve negativo.
+// Días calendario hasta el deadline (UTC, sin acoplarse a la zona horaria del runtime).
+// Cuando ya pasó, devuelve negativo.
 export function daysUntilDeadline(deadline, now = new Date()) {
   if (!deadline) return null;
   const d = new Date(deadline);
   if (Number.isNaN(d.getTime())) return null;
-  const ms = d.setHours(23, 59, 59, 999) - now.getTime();
-  return Math.ceil(ms / 86_400_000);
+  const deadlineDay = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+  const nowDay      = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  return Math.round((deadlineDay - nowDay) / 86_400_000);
 }
 
 export function isOverdue(deadline, now = new Date()) {
