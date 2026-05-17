@@ -1,25 +1,27 @@
-// ─── Badges / Insignias View — Premium ───────────────────────────────────────
+import { useState } from 'react';
+import { useApp } from '../store.jsx';
+import { BADGES } from '../data.js';
+import { DS } from '../components/ds.js';
+import { StatCard, BadgeCard, Modal, Pill } from '../components/UI.jsx';
+import { IcoBadge, IcoXp, IcoStar } from '../components/Icons.jsx';
 
-function ViewBadges() {
+export default function ViewBadges() {
   const { myStudent } = useApp();
-  const [selected, setSelected] = React.useState(null);
-  const [filterCat, setFilterCat] = React.useState('Todas');
+  const [selected, setSelected] = useState(null);
+  const [filterCat, setFilterCat] = useState('Todas');
 
-  const cats = ['Todas', ...Array.from(new Set(BADGES.map(b => b.cat)))];
+  const cats = ['Todas', ...Array.from(new Set(BADGES.map((b) => b.cat)))];
   const earnedIds = new Set(myStudent.earnedBadges);
-  const shown  = filterCat === 'Todas' ? BADGES : BADGES.filter(b => b.cat === filterCat);
-  const earned = shown.filter(b => earnedIds.has(b.id));
-  const locked = shown.filter(b => !earnedIds.has(b.id));
+  const shown  = filterCat === 'Todas' ? BADGES : BADGES.filter((b) => b.cat === filterCat);
+  const earned = shown.filter((b) => earnedIds.has(b.id));
+  const locked = shown.filter((b) => !earnedIds.has(b.id));
 
-  const C = { background: DS.card, border: `1px solid ${DS.bd}`, borderRadius: 16, boxShadow: '0 4px 20px rgba(0,0,0,0.38)' };
-
-  const totalXpEarned = BADGES.filter(b => earnedIds.has(b.id)).reduce((a, b) => a + b.xp, 0);
-  const rareEarned    = BADGES.filter(b => earnedIds.has(b.id) && b.rare).length;
+  const totalXpEarned = BADGES.filter((b) => earnedIds.has(b.id)).reduce((a, b) => a + b.xp, 0);
+  const rareEarned    = BADGES.filter((b) => earnedIds.has(b.id) && b.rare).length;
 
   return (
     <div className="rise-in" style={{ padding: 'clamp(14px,3vw,28px)', maxWidth: 1040, margin: '0 auto' }}>
 
-      {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(150px,1fr))', gap: 14, marginBottom: 22 }}>
         <div className="float-up d1">
           <StatCard label="Obtenidas" value={earnedIds.size} sub={`de ${BADGES.length} totales`} icon={<IcoBadge size={16} />} accent={DS.gold} />
@@ -32,15 +34,13 @@ function ViewBadges() {
         </div>
       </div>
 
-      {/* Category filter */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 22 }}>
-        {cats.map(c => (
+        {cats.map((c) => (
           <button key={c} onClick={() => setFilterCat(c)}
             className={`pill-btn${filterCat === c ? ' active' : ''}`}>{c}</button>
         ))}
       </div>
 
-      {/* Earned section */}
       {earned.length > 0 && (
         <div style={{ marginBottom: 32 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
@@ -58,7 +58,6 @@ function ViewBadges() {
         </div>
       )}
 
-      {/* Locked section */}
       {locked.length > 0 && (
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
@@ -76,7 +75,6 @@ function ViewBadges() {
         </div>
       )}
 
-      {/* Detail Modal */}
       <Modal open={!!selected} onClose={() => setSelected(null)} title="Detalle de insignia" width={400}>
         {selected && (
           <div style={{ textAlign: 'center' }}>
@@ -110,5 +108,3 @@ function ViewBadges() {
     </div>
   );
 }
-
-Object.assign(window, { ViewBadges });

@@ -30,9 +30,10 @@ logs/
 *.bak
 *.backup
 
-# ─── Node (por si en el futuro se añade build) ─────────
+# ─── Node / Vite build ─────────────────────────────────
 node_modules/
 dist/
+dev-dist/
 build/
 .cache/
 .parcel-cache/

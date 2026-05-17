@@ -1,10 +1,9 @@
-// ─── Charts (Dark Theme) ─────────────────────────────────────────────────────
-
-const {
+import {
   AreaChart, Area, BarChart, Bar, RadarChart, Radar,
   PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell,
-} = Recharts;
+} from 'recharts';
+import { DS } from './ds.js';
 
 const CHART_TICK  = { fontSize: 11, fill: '#5a6a8a', fontFamily: 'JetBrains Mono, monospace' };
 const CHART_TIP   = { background: '#0b1121', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 9, fontSize: 12, fontFamily: 'Inter, sans-serif', color: '#e8edf8' };
@@ -12,7 +11,7 @@ const CHART_GRID  = 'rgba(255,255,255,0.05)';
 const CHART_LABEL = { fontWeight: 600, color: '#e8edf8' };
 const CHART_ITEM  = { color: '#e8edf8' };
 
-function XPAreaChart({ data }) {
+export function XPAreaChart({ data }) {
   return (
     <ResponsiveContainer width="100%" height={180}>
       <AreaChart data={data} margin={{ top: 6, right: 4, left: -20, bottom: 0 }}>
@@ -34,7 +33,7 @@ function XPAreaChart({ data }) {
   );
 }
 
-function SubjectBarChart({ data }) {
+export function SubjectBarChart({ data }) {
   const COLORS = ['#4f8ef7','#0fd9a0','#f5a623','#a78bfa','#f43f5e'];
   return (
     <ResponsiveContainer width="100%" height={200}>
@@ -51,7 +50,7 @@ function SubjectBarChart({ data }) {
   );
 }
 
-function MiniSparkline({ data, color = '#f5a623' }) {
+export function MiniSparkline({ data, color = '#f5a623' }) {
   return (
     <ResponsiveContainer width="100%" height={44}>
       <AreaChart data={data} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
@@ -68,7 +67,7 @@ function MiniSparkline({ data, color = '#f5a623' }) {
   );
 }
 
-function SubjectProgressBars({ data }) {
+export function SubjectProgressBars({ data }) {
   const COLORS = ['#4f8ef7','#0fd9a0','#f5a623','#a78bfa','#f43f5e'];
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -95,16 +94,7 @@ function SubjectProgressBars({ data }) {
   );
 }
 
-const COMPETENCIAS_DATA = [
-  { area: 'Algoritmos',     value: 78 },
-  { area: 'Bases de Datos', value: 65 },
-  { area: 'POO',            value: 88 },
-  { area: 'Redes',          value: 52 },
-  { area: 'Matemáticas',    value: 70 },
-  { area: 'Soft Skills',    value: 83 },
-];
-
-function CompetenciasRadar({ data = COMPETENCIAS_DATA, height = 260 }) {
+export function CompetenciasRadar({ data, height = 260 }) {
   return (
     <ResponsiveContainer width="100%" height={height}>
       <RadarChart cx="50%" cy="50%" outerRadius="72%" data={data}>
@@ -118,5 +108,3 @@ function CompetenciasRadar({ data = COMPETENCIAS_DATA, height = 260 }) {
     </ResponsiveContainer>
   );
 }
-
-Object.assign(window, { XPAreaChart, SubjectBarChart, MiniSparkline, SubjectProgressBars, CompetenciasRadar, COMPETENCIAS_DATA });

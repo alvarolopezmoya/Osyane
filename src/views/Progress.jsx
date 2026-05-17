@@ -1,6 +1,12 @@
-// ─── Progress View — Premium ──────────────────────────────────────────────────
+import { useState } from 'react';
+import { useApp } from '../store.jsx';
+import { XP_HISTORY, SUBJECT_XP } from '../data.js';
+import { LEVELS } from '../utils/levels.js';
+import { DS } from '../components/ds.js';
+import { StatCard, SectionHeader, XPBar } from '../components/UI.jsx';
+import { IcoXp, IcoProgress, IcoStar, IcoAward, IcoCheck } from '../components/Icons.jsx';
+import { XPAreaChart, SubjectBarChart, SubjectProgressBars } from '../components/Charts.jsx';
 
-// SVG circular progress ring
 function RingProgress({ progress, size = 88, stroke = 7, color = '#4f8ef7', label, sub }) {
   const r = (size - stroke) / 2;
   const circ = 2 * Math.PI * r;
@@ -25,7 +31,6 @@ function RingProgress({ progress, size = 88, stroke = 7, color = '#4f8ef7', labe
   );
 }
 
-// Streak calendar
 function StreakCalendar({ streak }) {
   const days = 70;
   const today = new Date();
@@ -51,15 +56,15 @@ function StreakCalendar({ streak }) {
                 boxShadow: day.intensity === 'high' ? '0 0 6px rgba(79,142,247,0.5)' : 'none',
                 transition: 'transform .1s',
               }}
-                onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.4)'}
-                onMouseLeave={e => e.currentTarget.style.transform = ''} />
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.4)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = ''} />
             ))}
           </div>
         ))}
       </div>
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 10, fontSize: 10, color: DS.t2 }}>
         <span>Menos</span>
-        {['none','med','high'].map(k => (
+        {['none','med','high'].map((k) => (
           <div key={k} style={{ width: 10, height: 10, borderRadius: 2, background: intensityColors[k] }} />
         ))}
         <span>Más actividad</span>
@@ -103,9 +108,9 @@ function GradeComparison() {
   );
 }
 
-function ViewProgress() {
+export default function ViewProgress() {
   const { myStudent, levelInfo } = useApp();
-  const [tab, setTab] = React.useState('xp');
+  const [tab, setTab] = useState('xp');
   const totalXp = XP_HISTORY.reduce((a, b) => a + b.xp, 0);
   const avgXp   = Math.round(totalXp / XP_HISTORY.length);
   const bestWeek = XP_HISTORY.reduce((a, b) => a.xp > b.xp ? a : b);
@@ -120,14 +125,13 @@ function ViewProgress() {
   return (
     <div className="rise-in" style={{ padding: 'clamp(14px,3vw,28px)', maxWidth: 1140, margin: '0 auto' }}>
 
-      {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(170px,1fr))', gap: 14, marginBottom: 18 }}>
         {[
-          { label: 'XP Acumulado',     value: myStudent.xp.toLocaleString(), sub: 'Total histórico',    icon: <IcoXp size={16} />,      accent: DS.gold   },
-          { label: 'Promedio semanal', value: `${avgXp}`,                    sub: 'XP por semana',      icon: <IcoProgress size={16} />, accent: DS.blue   },
-          { label: 'Mejor semana',     value: `${bestWeek.xp}`,              sub: bestWeek.week,        icon: <IcoStar size={16} />,     accent: DS.purple },
-          { label: 'Nivel actual',     value: `N${levelInfo.n}`,             sub: levelInfo.title,      icon: <IcoAward size={16} />,    accent: DS.blue   },
-          { label: 'Nota promedio',    value: '8.3',                         sub: 'Sobre 10 · todas',   icon: <IcoCheck size={16} />,    accent: DS.green  },
+          { label: 'XP Acumulado',     value: myStudent.xp.toLocaleString(), sub: 'Total histórico',  icon: <IcoXp size={16} />,       accent: DS.gold   },
+          { label: 'Promedio semanal', value: `${avgXp}`,                    sub: 'XP por semana',    icon: <IcoProgress size={16} />, accent: DS.blue   },
+          { label: 'Mejor semana',     value: `${bestWeek.xp}`,              sub: bestWeek.week,      icon: <IcoStar size={16} />,     accent: DS.purple },
+          { label: 'Nivel actual',     value: `N${levelInfo.n}`,             sub: levelInfo.title,    icon: <IcoAward size={16} />,    accent: DS.blue   },
+          { label: 'Nota promedio',    value: '8.3',                         sub: 'Sobre 10 · todas', icon: <IcoCheck size={16} />,    accent: DS.green  },
         ].map((s, i) => (
           <div key={i} className={`float-up d${i+1}`}>
             <StatCard label={s.label} value={s.value} sub={s.sub} icon={s.icon} accent={s.accent} />
@@ -135,10 +139,8 @@ function ViewProgress() {
         ))}
       </div>
 
-      {/* Level + Streak */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: 16, marginBottom: 16 }}>
 
-        {/* Level progress with rings */}
         <div style={{ ...C, padding: 22 }}>
           <SectionHeader title="Progreso de nivel" sub={`Nivel ${levelInfo.n} · ${levelInfo.title}`} />
           <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 18 }}>
@@ -158,9 +160,8 @@ function ViewProgress() {
               )}
             </div>
           </div>
-          {/* Level dots */}
           <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
-            {LEVELS.map(l => {
+            {LEVELS.map((l) => {
               const done    = myStudent.xp >= l.max;
               const current = levelInfo.n === l.n;
               return (
@@ -179,7 +180,6 @@ function ViewProgress() {
           </div>
         </div>
 
-        {/* Streak calendar */}
         <div style={{ ...C, padding: 22 }}>
           <SectionHeader title="Consistencia — últimas 10 semanas" sub={`Racha actual: ${myStudent.streak} días 🔥`} />
           <StreakCalendar streak={myStudent.streak} />
@@ -198,12 +198,11 @@ function ViewProgress() {
         </div>
       </div>
 
-      {/* Tabbed charts */}
       <div style={{ ...C, overflow: 'hidden', marginBottom: 16 }}>
         <div style={{ display: 'flex', borderBottom: `1px solid ${DS.bd}`, overflowX: 'auto' }}>
-          {tabs.map(t => (
-            <button key={t.id} onClick={() => setTab(t.id)} className={`tab${tab === t.id ? ' active' : ''}`}>
-              {t.label}
+          {tabs.map((tDef) => (
+            <button key={tDef.id} onClick={() => setTab(tDef.id)} className={`tab${tab === tDef.id ? ' active' : ''}`}>
+              {tDef.label}
             </button>
           ))}
         </div>
@@ -269,5 +268,3 @@ function ViewProgress() {
     </div>
   );
 }
-
-Object.assign(window, { ViewProgress });

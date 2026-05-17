@@ -2,11 +2,12 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/React-18.3.1-61dafb?logo=react&logoColor=white" alt="React" />
-  <img src="https://img.shields.io/badge/Recharts-2.12-22c55e" alt="Recharts" />
-  <img src="https://img.shields.io/badge/Tailwind-v4-38bdf8?logo=tailwindcss&logoColor=white" alt="Tailwind" />
+  <img src="https://img.shields.io/badge/Vite-6-646cff?logo=vite&logoColor=white" alt="Vite" />
+  <img src="https://img.shields.io/badge/Vitest-2-6e9f18?logo=vitest&logoColor=white" alt="Vitest" />
+  <img src="https://img.shields.io/badge/PWA-installable-5a0fc8?logo=pwa&logoColor=white" alt="PWA" />
+  <img src="https://img.shields.io/badge/i18n-es%20%2F%20en-22c55e" alt="i18n" />
   <img src="https://img.shields.io/badge/license-MIT-f5a623" alt="License: MIT" />
-  <img src="https://img.shields.io/badge/status-MVP-4f8ef7" alt="Status: MVP" />
-  <img src="https://img.shields.io/badge/build-no_bundler-a78bfa" alt="No bundler" />
+  <img src="https://img.shields.io/badge/version-2.0-4f8ef7" alt="Version 2.0" />
 </p>
 
 > **Plataforma web de gamificación educativa** para la Facultad de Ingeniería en Sistemas, Electrónica e Industrial (FISEI) de la Universidad Técnica de Ambato (UTA).
@@ -56,99 +57,140 @@ Osyane convierte el rendimiento académico de los estudiantes en una experiencia
 
 ### Para estudiantes
 - 🏠 **Dashboard personal** con hero animado, estadísticas clave y feed de actividad reciente.
+- 📋 **Mis tareas** — listado con contador hasta el deadline, entregas con nota opcional y **auto-XP al aprobar**.
 - 🏆 **Ranking del grupo** con podio animado, búsqueda y comparativa de competencias.
 - 🏅 **Galería de insignias** con filtros por categoría, raras destacadas y vista de detalle.
 - 📊 **Vista de progreso** con anillo de nivel, calendario de constancia de 70 días, gráficos de XP semanal y comparativa de notas vs. promedio del grupo.
-- 🔔 **Notificaciones en tiempo real** sobre XP ganado, insignias y cambios en el ranking.
+- 🔔 **Notificaciones** sobre XP ganado, insignias y cambios en el ranking.
 - 👤 **Perfil propio** accesible desde cualquier vista.
-- 🔒 **Modo anónimo** para ocultar nombres de la mitad inferior del ranking.
 
 ### Para docentes
 - 👨‍🏫 **Panel del docente** con vista completa del grupo.
 - ➕ **Otorgar XP** con valores rápidos (25, 50, 100, 150, 200, 300) o personalizados, incluyendo motivo.
 - 🏅 **Conceder insignias** desde un selector visual.
 - 📋 **Gestión de tareas**: crear, listar y eliminar tareas con título, descripción, asignatura, fecha límite y XP de recompensa.
+- ✅ **Revisar entregas**: aprobar (otorga XP automáticamente) o rechazar (el alumno puede reintentar).
 - 📊 **Exportar reportes** a Excel (XLSX) y PDF imprimible.
 - 👁️ **Anonimizar nombres** del ranking para compartir capturas públicas.
 
 ### Comunes
 - 🌒 **Diseño dark premium** con efectos de glassmorphism, gradientes y micro-animaciones.
 - 📱 **Responsivo**: sidebar colapsable en desktop, barra inferior en mobile.
-- ⚡ **Sin servidor**: corre 100% en el navegador, datos en memoria.
+- 🌗 **Tema claro / oscuro** con toggle persistente.
+- 🌐 **i18n** español / inglés con autodetección del navegador.
+- 💾 **Persistencia local**: tu progreso se mantiene entre sesiones.
+- 📲 **PWA instalable** con soporte offline básico vía service worker.
 
 ---
 
 ## 🛠 Stack técnico
 
-| Capa             | Tecnología                                         |
-| ---------------- | -------------------------------------------------- |
-| UI Framework     | **React 18.3.1** (vía CDN, sin bundler)            |
-| Transpilación    | **Babel Standalone 7.29.0** (JSX in-browser)       |
-| Estilos          | **CSS personalizado** + **Tailwind v4** (CDN)      |
-| Gráficos         | **Recharts 2.12.7**                                |
-| Exportación      | **SheetJS (xlsx)**                                 |
-| Tipografías      | Inter, Plus Jakarta Sans, JetBrains Mono (Google Fonts) |
-| Empaquetado      | **Ninguno** — archivos `.jsx` cargados directamente con `<script type="text/babel">` |
+| Capa            | Tecnología                                              |
+| --------------- | ------------------------------------------------------- |
+| UI Framework    | **React 18.3.1** (ESM)                                  |
+| Bundler         | **Vite 6** + `@vitejs/plugin-react`                     |
+| PWA             | **vite-plugin-pwa** (service worker + precache offline) |
+| Estilos         | **CSS** (sin framework) con design tokens y data-theme  |
+| Gráficos        | **Recharts 2.12**                                       |
+| Exportación     | **SheetJS (xlsx)**                                      |
+| Tests           | **Vitest 2** + `jsdom`                                  |
+| i18n            | Custom context (es / en, autodetect navegador)          |
+| Persistencia    | `localStorage` (estudiantes, tareas, entregas, tema, idioma, sesión) |
+| Tipografías     | Inter, Plus Jakarta Sans, JetBrains Mono (Google Fonts) |
 
 ---
 
 ## 📁 Estructura del proyecto
 
 ```
-osyanne/
-├── index.html                 ← Shell HTML, tokens CSS globales, animaciones
-├── manifest.json              ← Web manifest (PWA-ready)
-├── assets/
-│   └── uta-logo.jpg
-└── src/
-    ├── data.jsx               ← Datos mock: estudiantes, docentes, insignias, niveles, tareas
-    ├── icons.jsx              ← Librería de iconos SVG inline
-    ├── ui.jsx                 ← Tokens DS + componentes (Avatar, XPBar, StatCard, BadgeCard, Btn, Modal…)
-    ├── charts.jsx             ← Gráficos Recharts (área, barras, radar, sparklines, progress bars)
-    ├── store.jsx              ← Estado global (Context API): login, students, tasks, notifications, role
-    ├── app.jsx                ← AppShell: login, sidebar, topbar, router de vistas
-    ├── view-dashboard.jsx     ← Vista 1 — Dashboard con bento grid
-    ├── view-leaderboard.jsx   ← Vista 2 — Ranking con podio animado
-    ├── view-badges.jsx        ← Vista 3 — Galería de insignias
-    ├── view-progress.jsx      ← Vista 4 — Progreso, niveles y notas
-    └── view-teacher.jsx       ← Vista 5 — Panel docente (XP, insignias, tareas)
+Osyane_v2/
+├── index.html                ← Entry HTML (Vite)
+├── vite.config.js            ← Build, PWA, code-splitting, Vitest config
+├── package.json              ← Scripts: dev / build / preview / test / deploy
+├── public/
+│   └── assets/uta-logo.jpg
+├── src/
+│   ├── main.jsx              ← Entry point (StrictMode + Providers)
+│   ├── App.jsx               ← Shell: login, sidebar, topbar, router de vistas
+│   ├── store.jsx             ← Estado global con localStorage persistence
+│   ├── data.js               ← Datos semilla (mock)
+│   ├── styles.css            ← CSS global + tokens + tema claro/oscuro
+│   ├── components/
+│   │   ├── ds.js             ← Design tokens y switch de tema
+│   │   ├── UI.jsx            ← Avatar, XPBar, StatCard, Modal, Toast, Btn…
+│   │   ├── Icons.jsx         ← Librería de iconos SVG inline
+│   │   └── Charts.jsx        ← Recharts wrappers
+│   ├── utils/
+│   │   ├── levels.js         ← getLevelInfo (pura, testeada)
+│   │   ├── ranking.js        ← buildLeaderboard, findRank
+│   │   ├── tasks.js          ← validateTask, daysUntilDeadline, isOverdue…
+│   │   └── storage.js        ← localStorage helpers + usePersistedState
+│   ├── i18n/
+│   │   ├── index.jsx         ← Provider con detección automática
+│   │   ├── es.js             ← Español
+│   │   └── en.js             ← Inglés
+│   ├── services/
+│   │   ├── api.js            ← Stub local + TODO[BACKEND] para Firebase/Supabase
+│   │   ├── auth.js           ← Login local + TODO[SSO] para MSAL/Azure AD UTA
+│   │   └── notifications.js  ← EventEmitter + TODO[REALTIME] para WS/SSE
+│   └── views/
+│       ├── Login.jsx
+│       ├── Dashboard.jsx
+│       ├── Leaderboard.jsx
+│       ├── Badges.jsx
+│       ├── Progress.jsx
+│       ├── StudentTasks.jsx  ← NUEVO: tareas del estudiante con entregas y auto-XP
+│       └── Teacher.jsx       ← Tabs: Estudiantes / Tareas / Entregas
+└── tests/
+    ├── levels.test.js        ← 11 tests
+    ├── ranking.test.js       ← 8 tests
+    └── tasks.test.js         ← 20 tests
 ```
 
 ---
 
 ## 🚀 Cómo ejecutarlo
 
-### Clonar el repositorio
+### Requisitos
+- **Node.js ≥ 20** y **npm ≥ 10**.
+
+### Instalación
+
 ```bash
-git clone https://github.com/TU_USUARIO/osyanne.git
-cd osyanne
+git clone https://github.com/alvarolopezmoya/Osyane.git
+cd Osyane
+npm install
 ```
 
-Como Osyane no requiere build, basta con servir los archivos por HTTP (los `<script type="text/babel">` no funcionan abriendo `index.html` directamente desde el sistema de archivos por restricciones CORS de Babel).
+### Desarrollo
 
-### Opción 1 · Con npm (recomendado)
 ```bash
-npm start
+npm run dev          # arranca Vite en http://localhost:5173 con HMR
 ```
-Abre automáticamente en [http://localhost:8080](http://localhost:8080).
 
-### Opción 2 · Servidor estático con Python
+### Producción
+
 ```bash
-python3 -m http.server 8080
+npm run build        # genera dist/ optimizado (~290 KB gzipped)
+npm run preview      # sirve dist/ localmente para probar el build
 ```
-Luego abre [http://localhost:8080](http://localhost:8080).
 
-### Opción 3 · VS Code
-Instala la extensión **Live Server** y haz clic derecho sobre `index.html` → *Open with Live Server*.
+### Tests
+
+```bash
+npm test             # corre los 39 tests con Vitest
+npm run test:watch   # modo watch para TDD
+```
 
 ### Deploy a GitHub Pages
-El repo incluye un workflow listo en `.github/workflows/deploy.yml`. Solo:
 
-1. Ve a **Settings → Pages** en tu repo.
-2. En **Source** selecciona **GitHub Actions**.
-3. Haz push a `main`. El sitio se publicará en `https://TU_USUARIO.github.io/osyanne/`.
+```bash
+# Si el repo se aloja en https://USUARIO.github.io/Osyane/:
+VITE_BASE=/Osyane/ npm run build
+npm run deploy       # publica dist/ a la rama gh-pages
+```
 
-> **Nota.** No hay dependencias a instalar. Todo se carga desde CDNs públicos en `index.html`.
+Luego en **Settings → Pages → Source** elige `gh-pages` branch. Alternativamente, configura un workflow de GitHub Actions que ejecute `npm run build` y suba `dist/` con `actions/deploy-pages`.
 
 ---
 
@@ -174,7 +216,7 @@ El sistema valida correos institucionales `@uta.edu.ec` contra una lista mock.
 | Sebastián Mora        | `smora6612@uta.edu.ec`          |
 | Camila Reyes          | `creyes7731@uta.edu.ec`         |
 | Diego Almeida         | `dalmeida4423@uta.edu.ec`       |
-| …y 10 más             | (ver `src/data.jsx`)            |
+| …y 10 más             | (ver `src/data.js`)             |
 
 El login también muestra **botones de acceso rápido** que rellenan automáticamente el formulario.
 
@@ -182,20 +224,23 @@ El login también muestra **botones de acceso rápido** que rellenan automática
 
 ## 👥 Roles y permisos
 
-Osyane diferencia dos roles. El rol se determina en el login según si el correo está en la lista `TEACHERS` o `STUDENTS` de `src/data.jsx`.
+Osyane diferencia dos roles. El rol se determina en el login según si el correo está en la lista `TEACHERS` o `STUDENTS` de `src/data.js`.
 
 | Capacidad                          | Estudiante | Docente |
 | ---------------------------------- | :--------: | :-----: |
 | Ver Dashboard, Ranking, Insignias, Progreso | ✅         | ❌       |
+| Ver mis tareas y entregarlas       | ✅         | ❌       |
 | Ver panel del Docente              | ❌         | ✅       |
 | Otorgar XP a estudiantes           | ❌         | ✅       |
 | Conceder insignias                 | ❌         | ✅       |
 | Crear / eliminar tareas            | ❌         | ✅       |
+| Aprobar / rechazar entregas        | ❌         | ✅       |
 | Exportar reportes (Excel / PDF)    | ❌         | ✅       |
 | Anonimizar nombres del ranking     | ❌         | ✅       |
+| Cambiar tema y idioma              | ✅         | ✅       |
 | Notificaciones                     | ✅         | ✅       |
 
-**Implementación.** En `src/store.jsx`, la función `login()` busca primero en `TEACHERS`. Si encuentra coincidencia, fija `userRole = 'teacher'`. Si no, busca en `STUDENTS` y fija `userRole = 'student'`. La sidebar filtra los items de navegación con `visibleNav = NAV_ITEMS.filter(item => item.id === 'teacher' ? isTeacher : true)`.
+**Implementación.** En `src/services/auth.js`, `loginLocal()` busca en `TEACHERS` primero, luego en `STUDENTS`. La sidebar filtra `NAV_ITEMS` por rol (`role: 'student' | 'teacher' | 'both'`).
 
 ---
 
@@ -233,19 +278,28 @@ Osyane diferencia dos roles. El rol se determina en el login según si el correo
   - Calificaciones vs. promedio
   - Tabla de niveles con título y rango de XP
 
-### 5 · Panel del Docente (solo profesores)
+### 5 · Tareas (solo estudiantes) — **NUEVA**
+- 4 stat cards: Tareas activas, XP obtenido, XP por ganar, Vencidas.
+- Búsqueda + filtros por estado (Todas / Pendientes / Entregadas / Aprobadas / Vencidas).
+- Cada tarea muestra **contador color-coded** hasta el deadline (rojo ≤ 2 d, dorado ≤ 7 d).
+- Botón **Entregar** abre modal con nota/enlace opcional. Estado pasa a "En revisión".
+- Al aprobar el docente, el estudiante recibe **+XP automático** + notificación + toast.
+- Si la entrega es rechazada, aparece botón **Reintentar**.
+
+### 6 · Panel del Docente (solo profesores)
 - Header con exportación a Excel/PDF y botón de nueva tarea.
 - 5 stat cards (Estudiantes, XP promedio, Líder, Tareas, XP total del grupo).
-- **2 pestañas**:
+- **3 pestañas**:
   - **Estudiantes**: tabla con búsqueda, botones `+XP` y `🏅` por fila.
-  - **Tareas**: grid de cards con accent bar por asignatura, fecha límite con alerta a < 3 días, botón eliminar.
-- **3 modales**: Otorgar XP, Otorgar insignia, Nueva tarea.
+  - **Tareas**: grid de cards con accent bar por asignatura, deadline con alerta a < 3 días, eliminar.
+  - **Entregas**: lista de entregas pendientes con botones Aprobar / Rechazar (con badge de contador).
+- **3 modales**: Otorgar XP, Otorgar insignia, Nueva tarea (con validación completa).
 
 ---
 
 ## 🆙 Sistema de niveles y XP
 
-Definido en `src/data.jsx` → `LEVELS`. Los rangos son acumulativos:
+Definido en `src/utils/levels.js` → `LEVELS`. Los rangos son acumulativos:
 
 | Nivel | Título         | XP requerido       |
 | :---: | -------------- | ------------------ |
@@ -323,62 +377,76 @@ Cada insignia define `xp` de recompensa (50 – 400) y se almacena en el array `
 
 ### Estado global
 
-Toda la lógica de negocio vive en `src/store.jsx` usando **React Context API**:
+`src/store.jsx` expone `AppProvider` y `useApp()` con **React Context API**. Los slices persistentes usan el hook `usePersistedState` de `src/utils/storage.js`, que es un `useState` espejado a `localStorage` con tolerancia a fallos (quota, modo privado).
 
 ```js
-const AppContext = React.createContext(null);
-
-function AppProvider({ children }) {
-  const [students, setStudents] = useState(STUDENTS);
-  const [tasks, setTasks] = useState(INITIAL_TASKS);
-  const [userRole, setUserRole] = useState(null);
-  // ... login, logout, awardXp, awardBadge, addTask, deleteTask, etc.
-}
+const [students, setStudents]   = usePersistedState('students', STUDENTS);
+const [tasks, setTasks]         = usePersistedState('tasks', INITIAL_TASKS);
+const [submissions, setSubsions]= usePersistedState('submissions', []);
+const [theme, setThemeState]    = usePersistedState('theme', 'dark');
 ```
 
-Cualquier componente accede vía `const { ... } = useApp()`.
+### Flujo de entrega → auto-XP
 
-### Carga de archivos
+1. Estudiante abre `StudentTasks` y clica **Entregar** → `submitTask(taskId, studentId, note)` crea un submission con `status: 'submitted'`.
+2. Docente abre la pestaña **Entregas** y clica **Aprobar** → `approveSubmission(id)` marca `status: 'approved'` y, en un microtask, llama a `awardXp(studentId, task.xp, 'Tarea X aprobada')`.
+3. `awardXp` actualiza el XP del estudiante, dispara una notificación (`pushNotif`), un toast (`showToast`) y emite el evento `xp.awarded` en `services/notifications.js` para suscriptores externos (TODO: WS/SSE).
 
-Por **no usar bundler**, cada archivo `.jsx` exporta sus símbolos a `window` al final:
+### i18n
 
-```js
-Object.assign(window, { Avatar, XPBar, StatCard, /* ... */ });
+- `useI18n()` devuelve `{ t, locale, setLocale }`.
+- `t('clave.anidada', { vars })` con interpolación `{name}` y fallback a español si la clave no existe.
+- Idioma persistido y autodetección por `navigator.language`.
+
+### Servicios (stubs)
+
+Tres archivos en `src/services/` documentan dónde conectar producción real:
+- **`api.js`** — `fetchStudents` / `saveTasks` / `fetchSubmissions` etc. usan `localStorage` hoy; cada función tiene un bloque `TODO[BACKEND]` describiendo cómo mapearla a Firebase, Supabase o Express + SQLite.
+- **`auth.js`** — `loginLocal()` valida contra datos mock; bloque `TODO[SSO]` indica los pasos exactos para conectar MSAL/Azure AD contra el tenant `@uta.edu.ec`.
+- **`notifications.js`** — `subscribe()` / `emit()` con event emitter local; bloque `TODO[REALTIME]` muestra cómo migrar a WebSocket o Server-Sent Events.
+
+---
+
+## 🧪 Tests
+
+39 tests en `tests/` ejecutados con Vitest + jsdom:
+
+| Suite                | Cubre                                                            |
+| -------------------- | ---------------------------------------------------------------- |
+| `levels.test.js`     | `getLevelInfo` (bordes, NaN, niveles extremos, continuidad).     |
+| `ranking.test.js`    | `buildLeaderboard` (orden, ranks, inmutabilidad, empates), `findRank`. |
+| `tasks.test.js`      | `validateTask`, `daysUntilDeadline`, `isOverdue`, `canSubmit`.    |
+
+```bash
+npm test
+# Test Files  3 passed (3)
+# Tests       39 passed (39)
 ```
-
-Esto permite que cualquier otro archivo cargado posteriormente en `index.html` use los componentes sin importarlos.
-
-### Orden de carga
-```
-data.jsx → icons.jsx → ui.jsx → charts.jsx → store.jsx → views → app.jsx
-```
-
-### Datos persistentes
-Actualmente **no hay persistencia**: cerrar el navegador descarta cambios. Para producción habría que integrar `localStorage`, IndexedDB o un backend.
 
 ---
 
 ## ⚠ Limitaciones actuales
 
-- **Sin backend**. Datos mock en memoria; no hay persistencia entre sesiones.
-- **Login simulado**. Cualquier estudiante o docente entra con `osyane` / `1234`. No hay hash, JWT, OAuth ni rate-limiting.
-- **Tareas sin entrega**. El docente puede crear tareas pero los estudiantes aún no las ven ni pueden entregarlas.
-- **Sin notificaciones push reales**. Las notificaciones son estáticas en `store.jsx`.
-- **Carga inicial lenta**. Babel transpila JSX en el browser (~1.5 MB de payload).
+- **Backend simulado con `localStorage`**. Los datos persisten **localmente por navegador**, no entre usuarios. Para multi-usuario real ver `TODO[BACKEND]` en `src/services/api.js`.
+- **Login local**. Cualquier estudiante o docente entra con `osyane` / `1234`. Para OAuth UTA ver `TODO[SSO]` en `src/services/auth.js`.
+- **Notificaciones sin transporte realtime**. Hoy son in-memory + persistencia local. Para WS/SSE ver `TODO[REALTIME]` en `src/services/notifications.js`.
 
 ---
 
-## 🔮 Próximos pasos
+## 🔮 Roadmap (v2.0 — entregado vs. pendiente)
 
-- [ ] **Persistencia con `localStorage`** para que el progreso se mantenga entre sesiones.
-- [ ] **Vista de tareas para estudiantes** con entregas, contador hasta deadline y auto-otorgación de XP al aprobar.
-- [ ] **Backend ligero** (Firebase, Supabase o Express + SQLite) para multi-usuario real.
-- [ ] **Auth con UTA SSO** (OAuth contra `@uta.edu.ec`).
-- [ ] **Notificaciones reales** vía WebSocket o Server-Sent Events.
-- [ ] **Bundle con Vite** para producción: ~80% menos payload, mejor SEO, PWA instalable.
-- [ ] **Modo claro** opcional como Tweak.
-- [ ] **Tests**: Vitest para `getLevelInfo`, lógica de ranking, validaciones de tareas.
-- [ ] **i18n**: soporte multilenguaje (es / en) para visibilidad internacional.
+### ✅ Entregado en v2.0
+- [x] **Persistencia con `localStorage`** para que el progreso se mantenga entre sesiones.
+- [x] **Vista de tareas para estudiantes** con entregas, contador hasta deadline y auto-otorgación de XP al aprobar.
+- [x] **Bundle con Vite** para producción: ~290 KB gzipped + PWA instalable + service worker.
+- [x] **Modo claro** opcional con toggle en topbar (persiste).
+- [x] **Tests** con Vitest: 39 tests cubriendo `getLevelInfo`, ranking, validaciones de tareas y deadlines.
+- [x] **i18n**: soporte multilenguaje (es / en) con autodetección y selector en topbar.
+
+### 🚧 Pendiente (con stubs documentados)
+- [ ] **Backend ligero** (Firebase, Supabase o Express + SQLite) para multi-usuario real — ver `TODO[BACKEND]` en `src/services/api.js`.
+- [ ] **Auth con UTA SSO** (OAuth contra `@uta.edu.ec` vía Azure AD / MSAL) — ver `TODO[SSO]` en `src/services/auth.js`.
+- [ ] **Notificaciones reales** vía WebSocket o Server-Sent Events — ver `TODO[REALTIME]` en `src/services/notifications.js`.
 
 ---
 

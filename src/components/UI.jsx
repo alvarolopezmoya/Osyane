@@ -1,31 +1,8 @@
-// ─── Design System Tokens + Components (Premium Dark) ────────────────────────
+import { useEffect } from 'react';
+import { DS } from './ds.js';
+import { IcoClose } from './Icons.jsx';
 
-const DS = {
-  bg:        '#060912',
-  sidebar:   '#040710',
-  card:      '#0b1121',
-  card2:     '#080e1e',
-  raised:    '#111c35',
-  bd:        'rgba(255,255,255,0.07)',
-  bdMd:      'rgba(255,255,255,0.11)',
-  bdHi:      'rgba(255,255,255,0.19)',
-  t1: '#e8edf8', t2: '#5a6a8a', t3: '#2c3a58',
-  blue:        '#4f8ef7',
-  blueBright:  '#7db3ff',
-  blueDim:     'rgba(79,142,247,0.12)',
-  blueGlow:    'rgba(79,142,247,0.38)',
-  blueMid:     'rgba(79,142,247,0.22)',
-  gold:        '#f5a623',
-  goldBright:  '#ffcc5c',
-  goldDim:     'rgba(245,166,35,0.13)',
-  goldGlow:    'rgba(245,166,35,0.42)',
-  green:  '#0fd9a0',
-  red:    '#f43f5e',
-  purple: '#a78bfa',
-};
-
-// ── Avatar ────────────────────────────────────────────────────────────────────
-function Avatar({ initials, size = 36, colorIndex = 0, glow = false }) {
+export function Avatar({ initials, size = 36, colorIndex = 0, glow = false }) {
   const pals = [
     ['linear-gradient(135deg,#1d4ed8,#4f8ef7)','#fff'],
     ['linear-gradient(135deg,#065f46,#0fd9a0)','#fff'],
@@ -36,7 +13,7 @@ function Avatar({ initials, size = 36, colorIndex = 0, glow = false }) {
     ['linear-gradient(135deg,#134e4a,#0fd9a0)','#fff'],
     ['linear-gradient(135deg,#1e1b4b,#6366f1)','#fff'],
   ];
-  const [bg, fg] = pals[colorIndex % pals.length];
+  const [bg, fg] = pals[Math.abs(colorIndex) % pals.length];
   const fs = size < 28 ? 10 : size < 36 ? 12 : size < 52 ? 14 : 18;
   return (
     <div style={{
@@ -49,8 +26,7 @@ function Avatar({ initials, size = 36, colorIndex = 0, glow = false }) {
   );
 }
 
-// ── XP Bar ────────────────────────────────────────────────────────────────────
-function XPBar({ progress, height = 7 }) {
+export function XPBar({ progress, height = 7 }) {
   return (
     <div className="xp-track" style={{ height }}>
       <div className="xp-fill" style={{ width: `${Math.min(100, Math.round(progress * 100))}%` }} />
@@ -58,8 +34,7 @@ function XPBar({ progress, height = 7 }) {
   );
 }
 
-// ── Stat Card ─────────────────────────────────────────────────────────────────
-function StatCard({ label, value, sub, icon, accent = '#4f8ef7', children }) {
+export function StatCard({ label, value, sub, icon, accent = '#4f8ef7', children }) {
   return (
     <div className="stat-card" style={{
       background: DS.card, border: `1px solid ${DS.bd}`,
@@ -68,7 +43,6 @@ function StatCard({ label, value, sub, icon, accent = '#4f8ef7', children }) {
       position: 'relative', overflow: 'hidden',
       display: 'flex', flexDirection: 'column', gap: 4,
     }}>
-      {/* Accent glow top-right */}
       <div style={{
         position: 'absolute', top: -40, right: -30, width: 120, height: 100,
         borderRadius: '50%',
@@ -89,8 +63,7 @@ function StatCard({ label, value, sub, icon, accent = '#4f8ef7', children }) {
   );
 }
 
-// ── Section Header ────────────────────────────────────────────────────────────
-function SectionHeader({ title, sub, action }) {
+export function SectionHeader({ title, sub, action }) {
   return (
     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
       <div>
@@ -102,8 +75,7 @@ function SectionHeader({ title, sub, action }) {
   );
 }
 
-// ── Pill ──────────────────────────────────────────────────────────────────────
-function Pill({ label, color = '#4f8ef7', bg }) {
+export function Pill({ label, color = '#4f8ef7', bg }) {
   return (
     <span style={{
       display: 'inline-flex', alignItems: 'center', padding: '3px 10px',
@@ -113,8 +85,7 @@ function Pill({ label, color = '#4f8ef7', bg }) {
   );
 }
 
-// ── Rank Badge ────────────────────────────────────────────────────────────────
-function RankBadge({ rank }) {
+export function RankBadge({ rank }) {
   const cfg = {
     1: { bg: 'linear-gradient(135deg,#92400e,#d97706)', color: '#fef3c7', shadow: '0 0 14px rgba(245,158,11,0.45)' },
     2: { bg: 'linear-gradient(135deg,#1e293b,#475569)', color: '#cbd5e1', shadow: 'none' },
@@ -130,8 +101,7 @@ function RankBadge({ rank }) {
   );
 }
 
-// ── Badge Card ────────────────────────────────────────────────────────────────
-function BadgeCard({ badge, earned = false, onClick }) {
+export function BadgeCard({ badge, earned = false, onClick }) {
   return (
     <div onClick={onClick}
       className={`badge-card${earned ? ' earned' : ''}`}
@@ -159,8 +129,7 @@ function BadgeCard({ badge, earned = false, onClick }) {
   );
 }
 
-// ── Button ────────────────────────────────────────────────────────────────────
-function Btn({ children, variant = 'primary', size = 'md', onClick, disabled, style: s }) {
+export function Btn({ children, variant = 'primary', size = 'md', onClick, disabled, type = 'button', style: s }) {
   const base = {
     border: 'none', borderRadius: 9, fontFamily: "'Inter',sans-serif", fontWeight: 600,
     cursor: disabled ? 'not-allowed' : 'pointer', transition: 'all .15s',
@@ -178,7 +147,7 @@ function Btn({ children, variant = 'primary', size = 'md', onClick, disabled, st
     danger:  { background: 'rgba(244,63,94,0.12)', color: '#f43f5e', border: '1px solid rgba(244,63,94,0.3)' },
   };
   return (
-    <button onClick={onClick} disabled={disabled} style={{ ...base, ...sizes[size], ...variants[variant], ...s }}
+    <button type={type} onClick={onClick} disabled={disabled} style={{ ...base, ...sizes[size], ...variants[variant], ...s }}
       onMouseEnter={e => { if (!disabled) e.currentTarget.style.filter = 'brightness(1.12)'; }}
       onMouseLeave={e => { e.currentTarget.style.filter = ''; }}>
       {children}
@@ -186,8 +155,7 @@ function Btn({ children, variant = 'primary', size = 'md', onClick, disabled, st
   );
 }
 
-// ── Input ─────────────────────────────────────────────────────────────────────
-function Input({ placeholder, value, onChange, icon, type = 'text', style: s }) {
+export function Input({ placeholder, value, onChange, icon, type = 'text', style: s }) {
   return (
     <div style={{ position: 'relative', ...s }}>
       {icon && <span style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', color: DS.t2, display: 'flex', pointerEvents: 'none' }}>{icon}</span>}
@@ -205,8 +173,7 @@ function Input({ placeholder, value, onChange, icon, type = 'text', style: s }) 
   );
 }
 
-// ── Modal ─────────────────────────────────────────────────────────────────────
-function Modal({ open, onClose, title, children, width = 480 }) {
+export function Modal({ open, onClose, title, children, width = 480 }) {
   if (!open) return null;
   return (
     <div className="fade-in" onClick={onClose} style={{
@@ -232,8 +199,7 @@ function Modal({ open, onClose, title, children, width = 480 }) {
   );
 }
 
-// ── Empty State ───────────────────────────────────────────────────────────────
-function EmptyState({ icon, title, sub }) {
+export function EmptyState({ icon, title, sub }) {
   return (
     <div style={{ textAlign: 'center', padding: '48px 24px' }}>
       <div style={{ width: 60, height: 60, borderRadius: 16, background: DS.card2, border: `1px solid ${DS.bd}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, margin: '0 auto 16px' }}>{icon}</div>
@@ -243,14 +209,13 @@ function EmptyState({ icon, title, sub }) {
   );
 }
 
-// ── Toast ─────────────────────────────────────────────────────────────────────
-function Toast({ message, type = 'success', onClose }) {
+export function Toast({ message, type = 'success', onClose }) {
   const cfg = {
-    success: { color: DS.green,  bd: 'rgba(15,217,160,0.25)' },
-    gold:    { color: DS.gold,   bd: 'rgba(245,166,35,0.25)' },
-    info:    { color: DS.blue,   bd: 'rgba(79,142,247,0.25)' },
+    success: { color: DS.green, bd: 'rgba(15,217,160,0.25)' },
+    gold:    { color: DS.gold,  bd: 'rgba(245,166,35,0.25)' },
+    info:    { color: DS.blue,  bd: 'rgba(79,142,247,0.25)' },
   }[type] || {};
-  React.useEffect(() => { const t = setTimeout(onClose, 3500); return () => clearTimeout(t); }, []);
+  useEffect(() => { const t = setTimeout(onClose, 3500); return () => clearTimeout(t); }, [onClose]);
   return (
     <div style={{
       position: 'fixed', bottom: 28, right: 28, zIndex: 2000,
@@ -266,5 +231,3 @@ function Toast({ message, type = 'success', onClose }) {
     </div>
   );
 }
-
-Object.assign(window, { DS, Avatar, XPBar, StatCard, SectionHeader, Pill, RankBadge, BadgeCard, Btn, Input, Modal, EmptyState, Toast });

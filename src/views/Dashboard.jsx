@@ -1,4 +1,11 @@
-// ─── Dashboard View — Premium Bento Grid ─────────────────────────────────────
+import { useEffect, useState } from 'react';
+import { useApp } from '../store.jsx';
+import { useI18n } from '../i18n/index.jsx';
+import { BADGES, ACTIVITY_FEED, SUBJECT_XP } from '../data.js';
+import { DS } from '../components/ds.js';
+import { Avatar, XPBar, StatCard, SectionHeader, RankBadge } from '../components/UI.jsx';
+import { IcoXp, IcoTrophy, IcoFlame, IcoBadge } from '../components/Icons.jsx';
+import { SubjectProgressBars } from '../components/Charts.jsx';
 
 const NEXT_ACHIEVEMENTS = [
   { name: 'Racha x14',    desc: '2 días más activo',       progress: 12, max: 14, icon: '🔥', color: '#f5a623' },
@@ -8,8 +15,8 @@ const NEXT_ACHIEVEMENTS = [
 ];
 
 function useLayoutSize() {
-  const [w, setW] = React.useState(window.innerWidth);
-  React.useEffect(() => {
+  const [w, setW] = useState(window.innerWidth);
+  useEffect(() => {
     const fn = () => setW(window.innerWidth);
     window.addEventListener('resize', fn);
     return () => window.removeEventListener('resize', fn);
@@ -17,10 +24,9 @@ function useLayoutSize() {
   return w > 1100 ? 'lg' : w > 700 ? 'md' : 'sm';
 }
 
-// ── Hero Banner ───────────────────────────────────────────────────────────────
-function DashHero({ myStudent, levelInfo, myRank, leaderboard, xpToNext, earnedBadges }) {
-  const [mounted, setMounted] = React.useState(false);
-  React.useEffect(() => { const t = setTimeout(() => setMounted(true), 80); return () => clearTimeout(t); }, []);
+function DashHero({ myStudent, levelInfo, myRank, leaderboard, xpToNext, earnedBadges, t }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { const x = setTimeout(() => setMounted(true), 80); return () => clearTimeout(x); }, []);
 
   return (
     <div style={{
@@ -30,7 +36,6 @@ function DashHero({ myStudent, levelInfo, myRank, leaderboard, xpToNext, earnedB
       borderRadius: 20, padding: 'clamp(24px,3vw,36px)',
       boxShadow: '0 8px 48px rgba(0,0,0,0.6)',
     }}>
-      {/* Animated aurora blobs */}
       <div style={{ position: 'absolute', top: -120, left: -60, width: 520, height: 420,
         background: 'radial-gradient(ellipse, rgba(79,142,247,0.16) 0%, transparent 65%)',
         animation: 'orb-float 11s ease-in-out infinite', pointerEvents: 'none' }} />
@@ -40,7 +45,6 @@ function DashHero({ myStudent, levelInfo, myRank, leaderboard, xpToNext, earnedB
 
       <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 28, flexWrap: 'wrap' }}>
 
-        {/* Spinning-ring avatar */}
         <div style={{ position: 'relative', flexShrink: 0 }}>
           <div style={{ position: 'absolute', inset: -6, borderRadius: '50%',
             background: 'conic-gradient(from 0deg, rgba(245,166,35,0.85), rgba(79,142,247,0.5), rgba(245,166,35,0.85))',
@@ -58,7 +62,6 @@ function DashHero({ myStudent, levelInfo, myRank, leaderboard, xpToNext, earnedB
           }}>N{levelInfo.n}</div>
         </div>
 
-        {/* Name + level + XP bar */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
             <span style={{
@@ -70,7 +73,7 @@ function DashHero({ myStudent, levelInfo, myRank, leaderboard, xpToNext, earnedB
               <span style={{
                 background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)',
                 color: '#94a3b8', borderRadius: 8, padding: '3px 10px', fontSize: 11, fontWeight: 600,
-              }}>🔥 {myStudent.streak} días</span>
+              }}>🔥 {myStudent.streak} {t('common.days')}</span>
             )}
           </div>
           <h1 className="head" style={{
@@ -78,31 +81,30 @@ function DashHero({ myStudent, levelInfo, myRank, leaderboard, xpToNext, earnedB
             fontWeight: 800, color: '#e8edf8', letterSpacing: '-.025em', lineHeight: 1.1,
           }}>{myStudent.name}</h1>
           <p style={{ margin: '0 0 16px', fontSize: 12, color: '#94a3b8', display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
-            <span>#{myRank} de {leaderboard.length}</span>
+            <span>#{myRank} {t('common.of')} {leaderboard.length}</span>
             <span style={{ opacity: 0.3 }}>·</span>
             <span>Ing. en Software · FISEI · UTA</span>
           </p>
           <div style={{ maxWidth: 480 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-              <span style={{ fontSize: 11, color: '#94a3b8', letterSpacing: '.04em' }}>→ NIVEL {levelInfo.n + 1}</span>
+              <span style={{ fontSize: 11, color: '#94a3b8', letterSpacing: '.04em' }}>{t('dashboard.nextLevel', { n: levelInfo.n + 1 })}</span>
               <span className="num" style={{ fontSize: 11, fontWeight: 700, color: '#f5a623' }}>
-                {levelInfo.max !== Infinity ? `${xpToNext.toLocaleString()} XP restantes` : '✦ Nivel máximo'}
+                {levelInfo.max !== Infinity ? t('dashboard.xpLeft', { xp: xpToNext.toLocaleString() }) : t('dashboard.maxLevel')}
               </span>
             </div>
             <XPBar progress={mounted ? levelInfo.progress : 0} height={10} />
           </div>
         </div>
 
-        {/* Big XP number */}
         <div style={{ textAlign: 'right', flexShrink: 0 }}>
-          <div style={{ fontSize: 10, color: '#64748b', letterSpacing: '.14em', textTransform: 'uppercase', marginBottom: 4 }}>XP Total</div>
+          <div style={{ fontSize: 10, color: '#64748b', letterSpacing: '.14em', textTransform: 'uppercase', marginBottom: 4 }}>{t('dashboard.statXp')}</div>
           <div className="num grad-text-gold" style={{ fontSize: 'clamp(36px,4vw,52px)', fontWeight: 900, lineHeight: 1 }}>
             {myStudent.xp.toLocaleString()}
           </div>
           <div style={{ fontSize: 11, color: '#64748b', marginTop: 6, display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-            <span>{earnedBadges.length} insignias</span>
+            <span>{earnedBadges.length} {t('dashboard.statBadges').toLowerCase()}</span>
             <span>·</span>
-            <span>{myStudent.streak}d racha</span>
+            <span>{myStudent.streak}d {t('common.days').slice(0,5)}</span>
           </div>
         </div>
 
@@ -111,10 +113,10 @@ function DashHero({ myStudent, levelInfo, myRank, leaderboard, xpToNext, earnedB
   );
 }
 
-// ── Main Dashboard View ───────────────────────────────────────────────────────
-function ViewDashboard() {
+export default function ViewDashboard() {
   const { myStudent, levelInfo, leaderboard, myRank } = useApp();
-  const earnedBadges = BADGES.filter(b => myStudent.earnedBadges.includes(b.id));
+  const { t } = useI18n();
+  const earnedBadges = BADGES.filter((b) => myStudent.earnedBadges.includes(b.id));
   const xpToNext = levelInfo.max === Infinity ? 0 : levelInfo.max - levelInfo.xp;
   const layout = useLayoutSize();
   const isLg = layout === 'lg';
@@ -124,23 +126,21 @@ function ViewDashboard() {
   const C = { background: DS.card, border: `1px solid ${DS.bd}`, borderRadius: 16, boxShadow: '0 4px 20px rgba(0,0,0,0.38)', padding: 20 };
 
   const stats = [
-    { label: 'XP Total',  value: myStudent.xp.toLocaleString(), sub: `Top ${Math.round(myRank/leaderboard.length*100)}% del grupo`, icon: <IcoXp size={16} />, accent: DS.gold },
-    { label: 'Ranking',   value: `#${myRank}`,  sub: `de ${leaderboard.length} estudiantes`, icon: <IcoTrophy size={16} />, accent: DS.blue },
-    { label: 'Racha',     value: `${myStudent.streak}d`, sub: 'Días consecutivos',  icon: <IcoFlame size={16} />, accent: '#f97316' },
-    { label: 'Insignias', value: `${earnedBadges.length}/${BADGES.length}`, sub: `${BADGES.filter(b=>earnedBadges.find(e=>e.id===b.id)&&b.rare).length} raras obtenidas`, icon: <IcoBadge size={16} />, accent: DS.purple },
+    { label: t('dashboard.statXp'),    value: myStudent.xp.toLocaleString(), sub: `Top ${Math.round((myRank/leaderboard.length)*100)}%`, icon: <IcoXp size={16} />, accent: DS.gold },
+    { label: t('dashboard.statRank'),  value: `#${myRank}`, sub: `${t('common.of')} ${leaderboard.length}`, icon: <IcoTrophy size={16} />, accent: DS.blue },
+    { label: t('dashboard.statStreak'),value: `${myStudent.streak}d`, sub: t('common.days'), icon: <IcoFlame size={16} />, accent: '#f97316' },
+    { label: t('dashboard.statBadges'),value: `${earnedBadges.length}/${BADGES.length}`, sub: `${BADGES.filter(b=>earnedBadges.find(e=>e.id===b.id)&&b.rare).length} raras`, icon: <IcoBadge size={16} />, accent: DS.purple },
   ];
 
   return (
     <div className="rise-in" style={{ padding: 'clamp(14px,2.5vw,28px)', maxWidth: 1300, margin: '0 auto' }}>
       <div style={{ display: 'grid', gridTemplateColumns: gridCols, gap: 14 }}>
 
-        {/* ── Hero ── */}
         <div style={{ gridColumn: '1/-1' }}>
           <DashHero myStudent={myStudent} levelInfo={levelInfo} myRank={myRank}
-            leaderboard={leaderboard} xpToNext={xpToNext} earnedBadges={earnedBadges} />
+            leaderboard={leaderboard} xpToNext={xpToNext} earnedBadges={earnedBadges} t={t} />
         </div>
 
-        {/* ── Stat cards ── */}
         {stats.map((s, i) => (
           <div key={i} className={`float-up d${i+1}`}
             style={{ gridColumn: isLg ? 'span 3' : isSm ? 'span 1' : 'span 3' }}>
@@ -148,10 +148,9 @@ function ViewDashboard() {
           </div>
         ))}
 
-        {/* ── Activity feed (tall, spans 2 rows on desktop) ── */}
         <div className="float-up d2"
           style={{ gridColumn: isLg ? 'span 5' : '1/-1', gridRow: isLg ? 'span 2' : 'auto', ...C }}>
-          <SectionHeader title="Actividad reciente" sub="Historial de logros y XP" />
+          <SectionHeader title={t('dashboard.activity')} sub={t('dashboard.activitySub')} />
           {ACTIVITY_FEED.map((a, i) => (
             <div key={a.id} style={{
               display: 'flex', gap: 12, alignItems: 'flex-start',
@@ -177,10 +176,8 @@ function ViewDashboard() {
           ))}
         </div>
 
-        {/* ── Next achievements ── */}
-        <div className="float-up d3"
-          style={{ gridColumn: isLg ? 'span 4' : '1/-1', ...C }}>
-          <SectionHeader title="Próximos logros" sub="Metas por desbloquear" />
+        <div className="float-up d3" style={{ gridColumn: isLg ? 'span 4' : '1/-1', ...C }}>
+          <SectionHeader title={t('dashboard.nextGoals')} sub={t('dashboard.nextGoalsSub')} />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {NEXT_ACHIEVEMENTS.map((a, i) => (
               <div key={i}>
@@ -203,11 +200,9 @@ function ViewDashboard() {
           </div>
         </div>
 
-        {/* ── Mini leaderboard ── */}
-        <div className="float-up d4"
-          style={{ gridColumn: isLg ? 'span 3' : isSm ? '1/-1' : 'span 3', ...C }}>
-          <SectionHeader title="Líderes" sub="Por XP total" />
-          {leaderboard.slice(0, 5).map(s => (
+        <div className="float-up d4" style={{ gridColumn: isLg ? 'span 3' : isSm ? '1/-1' : 'span 3', ...C }}>
+          <SectionHeader title={t('dashboard.leaders')} sub={t('dashboard.leadersSub')} />
+          {leaderboard.slice(0, 5).map((s) => (
             <div key={s.id} style={{
               display: 'flex', alignItems: 'center', gap: 9,
               padding: '7px 8px', borderRadius: 9, marginBottom: 3,
@@ -218,19 +213,17 @@ function ViewDashboard() {
               <RankBadge rank={s.rank} />
               <Avatar initials={s.initials} size={27} colorIndex={parseInt(s.id.slice(1))-1} />
               <span style={{ flex: 1, fontSize: 12, fontWeight: s.isMe ? 700 : 400, color: DS.t1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {s.name.split(' ')[0]}{s.isMe ? ' (tú)' : ''}
+                {s.name.split(' ')[0]}{s.isMe ? ` (${t('common.you')})` : ''}
               </span>
               <span className="num" style={{ fontSize: 11, color: DS.t2, flexShrink: 0 }}>{s.xp.toLocaleString()}</span>
             </div>
           ))}
         </div>
 
-        {/* ── Badges preview ── */}
-        <div className="float-up d3"
-          style={{ gridColumn: isLg ? 'span 7' : '1/-1', ...C }}>
-          <SectionHeader title="Mis insignias" sub={`${earnedBadges.length} / ${BADGES.length} obtenidas`} />
+        <div className="float-up d3" style={{ gridColumn: isLg ? 'span 7' : '1/-1', ...C }}>
+          <SectionHeader title={t('dashboard.myBadges')} sub={t('dashboard.earnedOf', { earned: earnedBadges.length, total: BADGES.length })} />
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            {BADGES.slice(0, 15).map(b => {
+            {BADGES.slice(0, 15).map((b) => {
               const earned = myStudent.earnedBadges.includes(b.id);
               return (
                 <div key={b.id} title={b.name} style={{
@@ -242,18 +235,16 @@ function ViewDashboard() {
                   boxShadow: earned ? `0 0 12px ${DS.goldDim}` : 'none',
                   transition: 'transform .15s, box-shadow .15s',
                 }}
-                  onMouseEnter={e => { if (earned) { e.currentTarget.style.transform = 'scale(1.18)'; e.currentTarget.style.boxShadow = `0 0 20px ${DS.goldGlow}`; } }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = earned ? `0 0 12px ${DS.goldDim}` : 'none'; }}
+                  onMouseEnter={(e) => { if (earned) { e.currentTarget.style.transform = 'scale(1.18)'; e.currentTarget.style.boxShadow = `0 0 20px ${DS.goldGlow}`; } }}
+                  onMouseLeave={(e) => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = earned ? `0 0 12px ${DS.goldDim}` : 'none'; }}
                 >{b.icon}</div>
               );
             })}
           </div>
         </div>
 
-        {/* ── Subject progress ── */}
-        <div className="float-up d4"
-          style={{ gridColumn: '1/-1', ...C, padding: '20px 24px' }}>
-          <SectionHeader title="Progreso por asignatura" sub="XP acumulado vs máximo posible en el semestre" />
+        <div className="float-up d4" style={{ gridColumn: '1/-1', ...C, padding: '20px 24px' }}>
+          <SectionHeader title={t('dashboard.subjectProgress')} sub={t('dashboard.subjectProgressSub')} />
           <SubjectProgressBars data={SUBJECT_XP} />
         </div>
 
@@ -261,5 +252,3 @@ function ViewDashboard() {
     </div>
   );
 }
-
-Object.assign(window, { ViewDashboard, useLayoutSize });

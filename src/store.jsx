@@ -1,107 +1,81 @@
-// ─── App State / Store ────────────────────────────────────────────────────────
+import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { STUDENTS, TEACHERS, INITIAL_TASKS, INITIAL_NOTIFICATIONS, BADGES } from './data.js';
+import { getLevelInfo } from './utils/levels.js';
+import { buildLeaderboard } from './utils/ranking.js';
+import { SUBMISSION_STATUS } from './utils/tasks.js';
+import { usePersistedState, load } from './utils/storage.js';
+import { DS, THEMES, applyTheme } from './components/ds.js';
+import { loginLocal } from './services/auth.js';
+import { emit as emitNotif, makeNotification } from './services/notifications.js';
 
-const AppContext = React.createContext(null);
+const AppContext = createContext(null);
 
-// ── Theme palettes ────────────────────────────────────────────────────────────
-const THEMES = {
-  dark: {
-    bg:        '#060912',  sidebar:   '#040710',  card:      '#0b1121',  card2:     '#080e1e',
-    raised:    '#111c35',
-    bd:        'rgba(255,255,255,0.07)',
-    bdMd:      'rgba(255,255,255,0.11)',
-    bdHi:      'rgba(255,255,255,0.19)',
-    t1: '#e8edf8', t2: '#5a6a8a', t3: '#2c3a58',
-    blue: '#4f8ef7', blueBright: '#7db3ff',
-    blueDim: 'rgba(79,142,247,0.12)', blueGlow: 'rgba(79,142,247,0.38)', blueMid: 'rgba(79,142,247,0.22)',
-    gold: '#f5a623', goldBright: '#ffcc5c',
-    goldDim: 'rgba(245,166,35,0.13)', goldGlow: 'rgba(245,166,35,0.42)',
-    green:  '#0fd9a0', red: '#f43f5e', purple: '#a78bfa',
-  },
-  light: {
-    bg:        '#f4f6fb',  sidebar:   '#ffffff',  card:      '#ffffff',  card2:     '#f8fafc',
-    raised:    '#eef2f7',
-    bd:        'rgba(15,19,32,0.07)',
-    bdMd:      'rgba(15,19,32,0.14)',
-    bdHi:      'rgba(15,19,32,0.22)',
-    t1: '#0f1320', t2: '#6b7293', t3: '#a0a7c0',
-    blue: '#3b82f6', blueBright: '#1d4ed8',
-    blueDim: 'rgba(59,130,246,0.09)', blueGlow: 'rgba(59,130,246,0.25)', blueMid: 'rgba(59,130,246,0.18)',
-    gold: '#d97706', goldBright: '#b45309',
-    goldDim: 'rgba(217,119,6,0.10)', goldGlow: 'rgba(217,119,6,0.32)',
-    green: '#059669', red: '#dc2626', purple: '#7c3aed',
-  },
-};
+export function AppProvider({ children }) {
+  // ── Persisted state ──────────────────────────────────────────────────────
+  const [students, setStudents]           = usePersistedState('students', STUDENTS);
+  const [tasks, setTasks]                 = usePersistedState('tasks', INITIAL_TASKS);
+  const [submissions, setSubmissions]     = usePersistedState('submissions', []);
+  const [notifications, setNotifications] = usePersistedState('notifications', INITIAL_NOTIFICATIONS);
+  const [theme, setThemeState]            = usePersistedState('theme', 'dark');
 
-const NOTIFICATIONS = [
-  { id: 'n1', icon: '⚡', text: 'Ganaste 120 XP en "Patrones de Diseño"', time: 'hace 2 h', unread: true },
-  { id: 'n2', icon: '🏅', text: 'Nueva insignia desbloqueada: "Precisión"',  time: 'hace 5 h', unread: true },
-  { id: 'n3', icon: '📈', text: 'Subiste al puesto #1 en Programación OO',   time: 'ayer',    unread: true },
-  { id: 'n4', icon: '🔥', text: 'Racha de 12 días — ¡sigue así!',            time: 'ayer',    unread: false },
-  { id: 'n5', icon: '🎯', text: 'Nuevo desafío: "Semana de Algoritmos"',     time: 'hace 2 d',unread: false },
-];
-
-const INITIAL_TASKS = [
-  { id: 'tk01', title: 'Proyecto API REST',        desc: 'Implementar API RESTful con Node.js y Express. Incluir autenticación JWT.',  subject: 'Ing. de Software', xp: 200, deadline: '2025-06-15' },
-  { id: 'tk02', title: 'Normalización BD',          desc: 'Normalizar el esquema de base de datos hasta la Tercera Forma Normal (3FN).', subject: 'Base de Datos',    xp: 100, deadline: '2025-06-10' },
-  { id: 'tk03', title: 'Algoritmos de Ordenación',  desc: 'Implementar QuickSort y MergeSort. Análisis de complejidad O(n).',           subject: 'Programación OO',  xp: 80,  deadline: '2025-06-20' },
-];
-
-function AppProvider({ children }) {
-  const [students, setStudents]       = React.useState(STUDENTS);
-  const [toast, setToast]             = React.useState(null);
-  const [activeView, setActiveView]   = React.useState('dashboard');
-  const [showRealNames, setShowRealNames] = React.useState(true);
-  const [notifications, setNotifications] = React.useState(NOTIFICATIONS);
-  const [notifOpen, setNotifOpen]     = React.useState(false);
-  const [loggedIn, setLoggedIn]       = React.useState(false);
-  const [userRole, setUserRole]       = React.useState(null);
-  const [currentTeacher, setCurrentTeacher] = React.useState(null);
-  const [tasks, setTasks]             = React.useState(INITIAL_TASKS);
-  const [theme, setThemeState]        = React.useState(() => {
-    try { return localStorage.getItem('osyane-theme') || 'dark'; } catch { return 'dark'; }
+  // ── Session state (NOT persisted: login is per-session) ──────────────────
+  const [activeView, setActiveView]         = useState('dashboard');
+  const [showRealNames, setShowRealNames]   = useState(true);
+  const [notifOpen, setNotifOpen]           = useState(false);
+  const [toast, setToast]                   = useState(null);
+  const [loggedIn, setLoggedIn]             = useState(() => !!load('session', null));
+  const [userRole, setUserRole]             = useState(() => load('session', null)?.role || null);
+  const [currentTeacher, setCurrentTeacher] = useState(() => {
+    const s = load('session', null);
+    return s?.role === 'teacher' ? s.user : null;
   });
 
-  // ── Live theme mutation: mutate the shared DS object so every component re-reads new values
-  Object.assign(DS, THEMES[theme]);
+  // ── Theme application ────────────────────────────────────────────────────
+  // Mutate DS in place so every component re-reads the new tokens on next render.
+  Object.assign(DS, THEMES[theme] || THEMES.dark);
+  useLayoutEffect(() => { applyTheme(theme); }, [theme]);
 
-  React.useLayoutEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    try { localStorage.setItem('osyane-theme', theme); } catch {}
-  }, [theme]);
-
+  function toggleTheme() { setThemeState((t) => (t === 'dark' ? 'light' : 'dark')); }
   function setTheme(t) { setThemeState(t); }
-  function toggleTheme() { setThemeState(t => t === 'dark' ? 'light' : 'dark'); }
 
-  const myStudent  = students.find(s => s.isMe);
-  const levelInfo  = getLevelInfo(myStudent.xp);
-  const leaderboard = [...students].sort((a, b) => b.xp - a.xp).map((s, i) => ({ ...s, rank: i + 1 }));
-  const myRank     = leaderboard.find(s => s.isMe)?.rank;
-  const unreadCount = notifications.filter(n => n.unread).length;
+  // ── Restore "isMe" from session ──────────────────────────────────────────
+  useEffect(() => {
+    const session = load('session', null);
+    if (session?.role === 'student' && session.user) {
+      setStudents((prev) => prev.map((s) => ({ ...s, isMe: s.id === session.user.id })));
+    }
+  }, []);
 
+  // ── Derived values ───────────────────────────────────────────────────────
+  const myStudent = useMemo(
+    () => students.find((s) => s.isMe) || students[0],
+    [students]
+  );
+  const levelInfo  = useMemo(() => getLevelInfo(myStudent?.xp || 0), [myStudent?.xp]);
+  const leaderboard = useMemo(() => buildLeaderboard(students), [students]);
+  const myRank     = useMemo(() => leaderboard.find((s) => s.isMe)?.rank ?? null, [leaderboard]);
+  const unreadCount = notifications.filter((n) => n.unread).length;
+
+  // ── Auth ─────────────────────────────────────────────────────────────────
   function login(email, password) {
-    if (!email || !password) return false;
-    const addr = email.trim().toLowerCase();
-    const pwd  = password.trim();
-    if (pwd !== 'osyane' && pwd !== '1234') return false;
+    const res = loginLocal(email, password);
+    if (!res.ok) return false;
 
-    // Check teachers first
-    const teacher = TEACHERS.find(t => t.email.toLowerCase() === addr);
-    if (teacher) {
-      setCurrentTeacher(teacher);
+    if (res.role === 'teacher') {
+      setCurrentTeacher(res.user);
       setUserRole('teacher');
       setLoggedIn(true);
       setActiveView('teacher');
+      try { localStorage.setItem('osyane:session', JSON.stringify({ role: 'teacher', user: res.user })); } catch {}
       return true;
     }
-
-    // Check students
-    const matched = STUDENTS.find(s => s.email.toLowerCase() === addr);
-    if (!matched) return false;
-    setStudents(prev => prev.map(s => ({ ...s, isMe: s.id === matched.id })));
+    // student
+    setStudents((prev) => prev.map((s) => ({ ...s, isMe: s.id === res.user.id })));
     setCurrentTeacher(null);
     setUserRole('student');
     setLoggedIn(true);
     setActiveView('dashboard');
+    try { localStorage.setItem('osyane:session', JSON.stringify({ role: 'student', user: res.user })); } catch {}
     return true;
   }
 
@@ -109,45 +83,100 @@ function AppProvider({ children }) {
     setLoggedIn(false);
     setUserRole(null);
     setCurrentTeacher(null);
+    try { localStorage.removeItem('osyane:session'); } catch {}
   }
 
   function maskName(student) {
     if (showRealNames || student.isMe) return student.name;
-    const rank = leaderboard.find(s => s.id === student.id)?.rank || '?';
+    const rank = leaderboard.find((s) => s.id === student.id)?.rank || '?';
     return `Estudiante #${rank}`;
   }
 
+  // ── XP / Badges ──────────────────────────────────────────────────────────
   function awardXp(studentId, amount, reason) {
-    setStudents(prev => prev.map(s => s.id === studentId ? { ...s, xp: s.xp + amount } : s));
+    setStudents((prev) => prev.map((s) => (s.id === studentId ? { ...s, xp: s.xp + amount } : s)));
+    pushNotif(makeNotification(`+${amount} XP — ${reason}`, '⚡'));
     showToastMsg(`+${amount} XP otorgado — ${reason}`, 'gold');
+    emitNotif({ type: 'xp.awarded', studentId, amount, reason });
   }
 
   function awardBadge(studentId, badgeId) {
-    setStudents(prev => prev.map(s =>
+    setStudents((prev) => prev.map((s) =>
       s.id === studentId && !s.earnedBadges.includes(badgeId)
-        ? { ...s, earnedBadges: [...s.earnedBadges, badgeId] } : s
+        ? { ...s, earnedBadges: [...s.earnedBadges, badgeId] }
+        : s
     ));
-    const badge = BADGES.find(b => b.id === badgeId);
+    const badge = BADGES.find((b) => b.id === badgeId);
+    pushNotif(makeNotification(`Insignia desbloqueada: "${badge?.name}"`, '🏅'));
     showToastMsg(`Insignia "${badge?.name}" otorgada`, 'success');
+    emitNotif({ type: 'badge.earned', studentId, badgeId });
   }
 
+  // ── Tasks ────────────────────────────────────────────────────────────────
   function addTask(task) {
     const newTask = { ...task, id: 'tk' + Date.now() };
-    setTasks(prev => [newTask, ...prev]);
+    setTasks((prev) => [newTask, ...prev]);
+    pushNotif(makeNotification(`Nueva tarea: "${task.title}"`, '📋'));
     showToastMsg(`Tarea "${task.title}" creada`, 'success');
+    emitNotif({ type: 'task.assigned', task: newTask });
+  }
+  function deleteTask(taskId) {
+    setTasks((prev) => prev.filter((t) => t.id !== taskId));
+    setSubmissions((prev) => prev.filter((s) => s.taskId !== taskId));
+    showToastMsg('Tarea eliminada', 'info');
   }
 
-  function deleteTask(taskId) {
-    setTasks(prev => prev.filter(t => t.id !== taskId));
-    showToastMsg('Tarea eliminada', 'info');
+  // ── Submissions ──────────────────────────────────────────────────────────
+  function submitTask(taskId, studentId, note = '') {
+    setSubmissions((prev) => {
+      const existing = prev.find((s) => s.taskId === taskId && s.studentId === studentId);
+      if (existing && existing.status === SUBMISSION_STATUS.APPROVED) return prev;
+      const next = prev.filter((s) => !(s.taskId === taskId && s.studentId === studentId));
+      next.unshift({
+        id: 'sb' + Date.now(),
+        taskId, studentId, note,
+        status: SUBMISSION_STATUS.SUBMITTED,
+        submittedAt: new Date().toISOString(),
+      });
+      return next;
+    });
+    showToastMsg('Entrega enviada — pendiente de revisión', 'info');
+  }
+
+  function approveSubmission(submissionId) {
+    let target;
+    setSubmissions((prev) => prev.map((s) => {
+      if (s.id !== submissionId) return s;
+      target = s;
+      return { ...s, status: SUBMISSION_STATUS.APPROVED, reviewedAt: new Date().toISOString() };
+    }));
+    // Defer awardXp until after state update applies cleanly.
+    queueMicrotask(() => {
+      if (!target) return;
+      const task = tasks.find((t) => t.id === target.taskId);
+      if (task) awardXp(target.studentId, task.xp, `Tarea "${task.title}" aprobada`);
+    });
+  }
+
+  function rejectSubmission(submissionId) {
+    setSubmissions((prev) => prev.map((s) =>
+      s.id === submissionId
+        ? { ...s, status: SUBMISSION_STATUS.REJECTED, reviewedAt: new Date().toISOString() }
+        : s
+    ));
+    showToastMsg('Entrega rechazada', 'info');
+  }
+
+  // ── Notifications ────────────────────────────────────────────────────────
+  function pushNotif(n) {
+    setNotifications((prev) => [n, ...prev].slice(0, 30));
+  }
+  function markAllRead() {
+    setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
   }
 
   function showToastMsg(message, type = 'success') {
     setToast({ message, type, id: Date.now() });
-  }
-
-  function markAllRead() {
-    setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
   }
 
   const ctx = {
@@ -161,12 +190,16 @@ function AppProvider({ children }) {
     loggedIn, login, logout,
     userRole, currentTeacher,
     tasks, addTask, deleteTask,
+    submissions, submitTask, approveSubmission, rejectSubmission,
     theme, setTheme, toggleTheme,
   };
 
   return <AppContext.Provider value={ctx}>{children}</AppContext.Provider>;
 }
 
-function useApp() { return React.useContext(AppContext); }
+export function useApp() {
+  const ctx = useContext(AppContext);
+  if (!ctx) throw new Error('useApp debe usarse dentro de <AppProvider>');
+  return ctx;
+}
 
-Object.assign(window, { AppContext, AppProvider, useApp, NOTIFICATIONS, INITIAL_TASKS });

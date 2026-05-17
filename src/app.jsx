@@ -1,180 +1,33 @@
-// ─── Login Screen ─────────────────────────────────────────────────────────────
-function LoginScreen({ onLogin }) {
-  const [username, setUsername] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [error, setError] = React.useState('');
-  const [loading, setLoading] = React.useState(false);
-  const [shaking, setShaking] = React.useState(false);
-
-  function tryLogin(u, p) {
-    const usr = (u !== undefined ? u : username).trim();
-    const pwd = (p !== undefined ? p : password).trim();
-    if (!usr || !pwd) {setError('Completa usuario y contraseña.');return;}
-    setLoading(true);setError('');
-    setTimeout(() => {
-      const ok = onLogin(usr, pwd);
-      setLoading(false);
-      if (!ok) {
-        setError('Nombre incorrecto o contraseña inválida.');
-        setShaking(true);
-        setTimeout(() => setShaking(false), 600);
-      }
-    }, 650);
-  }
-
-  function quickLogin(s) {
-    setUsername(s.email);setPassword('osyane');
-    tryLogin(s.email, 'osyane');
-  }
-
-  return (
-    <div style={{
-      position: 'fixed', inset: 0, background: DS.bg,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      padding: 20, overflowY: 'auto'
-    }}>
-      {/* Ambient blobs */}
-      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none',
-        background: `radial-gradient(ellipse 65% 55% at 20% 15%, rgba(79,142,247,0.13) 0%, transparent 60%),
-                     radial-gradient(ellipse 55% 60% at 82% 82%, rgba(167,139,250,0.09) 0%, transparent 60%)` }} />
-
-      <div className={`rise-in${shaking ? ' shake' : ''}`}
-      style={{ position: 'relative', width: '100%', maxWidth: 440, zIndex: 1, margin: 'auto' }}>
-
-        {/* Glass card */}
-        <div style={{
-          background: DS.card,
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          border: `1px solid ${DS.bdMd}`, borderRadius: 24,
-          padding: '36px 36px 30px',
-          boxShadow: '0 32px 80px rgba(0,0,0,0.5)'
-        }}>
-
-          {/* Brand */}
-          <div style={{ textAlign: 'center', marginBottom: 28 }}>
-            <div style={{
-              width: 58, height: 58, borderRadius: 17, margin: '0 auto 14px',
-              background: 'linear-gradient(135deg,#1d4ed8,#4f8ef7)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 28, fontWeight: 900, color: '#fff',
-              fontFamily: "'Plus Jakarta Sans',sans-serif",
-              boxShadow: '0 0 36px rgba(79,142,247,0.5)'
-            }}>O</div>
-            <h1 className="head" style={{ fontSize: 24, fontWeight: 800, color: DS.t1, margin: '0 0 4px', letterSpacing: '-.02em' }}>Osyane</h1>
-            <p style={{ margin: 0, fontSize: 13, color: DS.t2 }}>FISEI · Universidad Técnica de Ambato</p>
-          </div>
-
-          {/* Form */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <div>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: DS.t2, marginBottom: 6, letterSpacing: '.07em', textTransform: 'uppercase' }}>Correo institucional</label>
-              <Input placeholder="usuario@uta.edu.ec" value={username} icon={<IcoSearch size={15} />}
-              onChange={(e) => setUsername(e.target.value)} />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: DS.t2, marginBottom: 6, letterSpacing: '.07em', textTransform: 'uppercase' }}>Contraseña</label>
-              <Input placeholder="••••••••" value={password} type="password"
-              onChange={(e) => setPassword(e.target.value)} />
-            </div>
-
-            {error &&
-            <div style={{ background: 'rgba(244,63,94,0.1)', border: '1px solid rgba(244,63,94,0.28)', borderRadius: 9, padding: '10px 14px', fontSize: 13, color: '#f87171' }}>
-                {error}
-              </div>
-            }
-
-            <button
-              onClick={() => tryLogin()} disabled={loading}
-              style={{
-                width: '100%', padding: '12px', borderRadius: 10, border: 'none',
-                background: loading ? 'rgba(79,142,247,0.4)' : 'linear-gradient(135deg,#1d4ed8,#4f8ef7)',
-                color: '#fff', fontSize: 14, fontWeight: 700,
-                fontFamily: "'Inter',sans-serif", cursor: loading ? 'default' : 'pointer',
-                boxShadow: loading ? 'none' : '0 4px 18px rgba(79,142,247,0.45)',
-                transition: 'all .2s', letterSpacing: '.01em'
-              }}
-              onMouseEnter={(e) => {if (!loading) e.currentTarget.style.filter = 'brightness(1.1)';}}
-              onMouseLeave={(e) => {e.currentTarget.style.filter = '';}}>
-              {loading ? 'Ingresando…' : 'Ingresar →'}
-            </button>
-          </div>
-
-          {/* Quick access */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '22px 0 16px' }}>
-            <div style={{ flex: 1, height: 1, background: DS.bd }} />
-            <span style={{ fontSize: 10, color: DS.t3, fontWeight: 700, letterSpacing: '.08em' }}>ACCESO RÁPIDO</span>
-            <div style={{ flex: 1, height: 1, background: DS.bd }} />
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {/* Teachers */}
-            {TEACHERS.map((t) => (
-              <button key={t.id} onClick={() => quickLogin(t)} style={{
-                display: 'flex', alignItems: 'center', gap: 12,
-                padding: '10px 14px', borderRadius: 11,
-                border: '1px solid rgba(167,139,250,0.25)',
-                background: 'rgba(167,139,250,0.07)',
-                cursor: 'pointer', width: '100%', textAlign: 'left', transition: 'all .15s',
-              }}
-                onMouseEnter={(e) => { e.currentTarget.style.background='rgba(167,139,250,0.14)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background='rgba(167,139,250,0.07)'; }}>
-                <Avatar initials={t.initials} size={34} colorIndex={5} />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: DS.t1 }}>{t.name}</span>
-                    <span style={{ fontSize: 9, fontWeight: 800, background: 'rgba(167,139,250,0.2)', color: '#a78bfa', borderRadius: 4, padding: '1px 6px', letterSpacing: '.05em' }}>DOCENTE</span>
-                  </div>
-                  <div style={{ fontSize: 10, color: DS.t2, fontFamily: "'JetBrains Mono',monospace", overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.email}</div>
-                </div>
-                <span style={{ fontSize: 12, color: DS.t3 }}>→</span>
-              </button>
-            ))}
-            {/* Students */}
-            {STUDENTS.slice(0, 4).map((s) => {
-              return (
-                <button key={s.id} onClick={() => quickLogin(s)} style={{
-                  display: 'flex', alignItems: 'center', gap: 12,
-                  padding: '10px 14px', borderRadius: 11,
-                  border: `1px solid ${DS.bd}`, background: DS.card2,
-                  cursor: 'pointer', width: '100%', textAlign: 'left', transition: 'all .15s',
-                }}
-                onMouseEnter={(e) => {e.currentTarget.style.background = `${DS.blue}0f`;e.currentTarget.style.borderColor = `${DS.blue}44`;}}
-                onMouseLeave={(e) => {e.currentTarget.style.background = DS.card2;e.currentTarget.style.borderColor = DS.bd;}}>
-                  <Avatar initials={s.initials} size={34} colorIndex={parseInt(s.id.slice(1)) - 1} />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: DS.t1 }}>{s.name}</div>
-                    <div style={{ fontSize: 10, color: DS.t2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'JetBrains Mono',monospace" }}>{s.email}</div>
-                  </div>
-                  <span style={{ fontSize: 12, color: DS.t3 }}>→</span>
-                </button>);
-            })}
-          </div>
-
-          <p style={{ margin: '16px 0 0', textAlign: 'center', fontSize: 11, color: DS.t3 }}>
-            Contraseña para todos: <span style={{ color: DS.t2, fontWeight: 600, fontFamily: "'JetBrains Mono',monospace" }}>osyane</span>
-            <br />
-            <span style={{ color: DS.t3 }}>Ej: <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>ogranda8821@uta.edu.ec</span></span>
-          </p>
-        </div>
-      </div>
-    </div>);
-
-}
-
-// ─── App Shell — Premium Dark Edition ─────────────────────────────────────────
+import { useEffect, useState } from 'react';
+import { useApp } from './store.jsx';
+import { useI18n, LOCALES } from './i18n/index.jsx';
+import { BADGES } from './data.js';
+import { DS } from './components/ds.js';
+import { Avatar, XPBar, Toast } from './components/UI.jsx';
+import {
+  IcoDashboard, IcoRanking, IcoBadge, IcoProgress, IcoTeacher, IcoTasks,
+  IcoBell, IcoEye, IcoChevron, IcoClose, IcoMenu, IcoSun, IcoMoon, IcoGlobe,
+} from './components/Icons.jsx';
+import LoginScreen from './views/Login.jsx';
+import ViewDashboard from './views/Dashboard.jsx';
+import ViewLeaderboard from './views/Leaderboard.jsx';
+import ViewBadges from './views/Badges.jsx';
+import ViewProgress from './views/Progress.jsx';
+import ViewTeacher from './views/Teacher.jsx';
+import ViewStudentTasks from './views/StudentTasks.jsx';
 
 const NAV_ITEMS = [
-{ id: 'dashboard', label: 'Dashboard', icon: IcoDashboard },
-{ id: 'leaderboard', label: 'Ranking', icon: IcoRanking },
-{ id: 'badges', label: 'Insignias', icon: IcoBadge },
-{ id: 'progress', label: 'Progreso', icon: IcoProgress },
-{ id: 'teacher', label: 'Docente', icon: IcoTeacher }];
-
+  { id: 'dashboard',   labelKey: 'nav.dashboard',   icon: IcoDashboard, role: 'student' },
+  { id: 'leaderboard', labelKey: 'nav.leaderboard', icon: IcoRanking,   role: 'both'    },
+  { id: 'badges',      labelKey: 'nav.badges',      icon: IcoBadge,     role: 'student' },
+  { id: 'progress',    labelKey: 'nav.progress',    icon: IcoProgress,  role: 'student' },
+  { id: 'tasks',       labelKey: 'nav.tasks',       icon: IcoTasks,     role: 'student' },
+  { id: 'teacher',     labelKey: 'nav.teacher',     icon: IcoTeacher,   role: 'teacher' },
+];
 
 function useIsMobile() {
-  const [m, setM] = React.useState(window.innerWidth < 768);
-  React.useEffect(() => {
+  const [m, setM] = useState(window.innerWidth < 768);
+  useEffect(() => {
     const fn = () => setM(window.innerWidth < 768);
     window.addEventListener('resize', fn);
     return () => window.removeEventListener('resize', fn);
@@ -182,7 +35,6 @@ function useIsMobile() {
   return m;
 }
 
-// ── Profile Modal ─────────────────────────────────────────────────────────────
 function ProfileModal({ open, onClose }) {
   const { myStudent, levelInfo, myRank } = useApp();
   if (!open) return null;
@@ -200,7 +52,6 @@ function ProfileModal({ open, onClose }) {
         boxShadow: '0 40px 100px rgba(0,0,0,0.85)',
         overflow: 'hidden'
       }}>
-        {/* Banner */}
         <div style={{
           background: 'linear-gradient(135deg,#04091a 0%,#091e40 50%,#04091a 100%)',
           padding: '28px 28px 24px', position: 'relative', overflow: 'hidden'
@@ -215,10 +66,9 @@ function ProfileModal({ open, onClose }) {
             background: 'rgba(255,255,255,0.08)', border: 'none',
             borderRadius: 7, cursor: 'pointer', color: DS.t2,
             display: 'flex', padding: 7, transition: 'background .15s'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.14)'}
-          onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}>
-            <IcoClose size={14} /></button>
+          }}>
+            <IcoClose size={14} />
+          </button>
           <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 18 }}>
             <Avatar initials={myStudent.initials} size={64} colorIndex={0} glow />
             <div>
@@ -233,7 +83,7 @@ function ProfileModal({ open, onClose }) {
                   boxShadow: '0 2px 10px rgba(245,166,35,0.4)'
                 }}>N{levelInfo.n} · {levelInfo.title}</span>
                 {myStudent.streak > 0 &&
-                <span style={{ background: 'rgba(255,255,255,0.08)', color: '#94a3b8', borderRadius: 7, padding: '3px 10px', fontSize: 11, fontWeight: 600 }}>
+                  <span style={{ background: 'rgba(255,255,255,0.08)', color: '#94a3b8', borderRadius: 7, padding: '3px 10px', fontSize: 11, fontWeight: 600 }}>
                     🔥 {myStudent.streak}d
                   </span>
                 }
@@ -241,8 +91,6 @@ function ProfileModal({ open, onClose }) {
             </div>
           </div>
         </div>
-
-        {/* Body */}
         <div style={{ padding: '22px 28px 28px' }}>
           <div style={{ marginBottom: 20 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
@@ -258,36 +106,63 @@ function ProfileModal({ open, onClose }) {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 20 }}>
             {[
-            { label: 'XP Total', val: myStudent.xp.toLocaleString() },
-            { label: 'Posición', val: `#${myRank}` },
-            { label: 'Insignias', val: earned.length }].
-            map((s, i) =>
-            <div key={i} style={{ background: DS.card2, border: `1px solid ${DS.bd}`, borderRadius: 11, padding: '10px 12px', textAlign: 'center' }}>
+              { label: 'XP Total', val: myStudent.xp.toLocaleString() },
+              { label: 'Posición', val: `#${myRank}` },
+              { label: 'Insignias', val: earned.length },
+            ].map((s, i) => (
+              <div key={i} style={{ background: DS.card2, border: `1px solid ${DS.bd}`, borderRadius: 11, padding: '10px 12px', textAlign: 'center' }}>
                 <div className="num" style={{ fontSize: 18, fontWeight: 800, color: DS.t1 }}>{s.val}</div>
                 <div style={{ fontSize: 10, color: DS.t2, marginTop: 3, fontWeight: 600, letterSpacing: '.05em', textTransform: 'uppercase' }}>{s.label}</div>
               </div>
-            )}
+            ))}
           </div>
           <div style={{ fontSize: 11, fontWeight: 700, color: DS.t3, textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: 10 }}>
             Insignias obtenidas
           </div>
           <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
-            {earned.map((b) =>
-            <div key={b.id} title={b.name} style={{
-              width: 38, height: 38, borderRadius: 9,
-              background: DS.goldDim, border: `1px solid ${DS.gold}44`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18
-            }}>{b.icon}</div>
-            )}
+            {earned.map((b) => (
+              <div key={b.id} title={b.name} style={{
+                width: 38, height: 38, borderRadius: 9,
+                background: DS.goldDim, border: `1px solid ${DS.gold}44`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18
+              }}>{b.icon}</div>
+            ))}
             {earned.length === 0 && <span style={{ fontSize: 12, color: DS.t3 }}>Sin insignias todavía</span>}
           </div>
         </div>
       </div>
-    </div>);
-
+    </div>
+  );
 }
 
-// ── AppShell ──────────────────────────────────────────────────────────────────
+function LanguageMenu({ open, onClose, current, onChange }) {
+  if (!open) return null;
+  return (
+    <div style={{
+      position: 'fixed', top: 58, right: 110, zIndex: 2000,
+      background: DS.card, border: `1px solid ${DS.bdMd}`,
+      borderRadius: 11, padding: 4, boxShadow: '0 16px 40px rgba(0,0,0,0.6)',
+      display: 'flex', flexDirection: 'column', minWidth: 160,
+    }} onClick={(e) => e.stopPropagation()}>
+      {LOCALES.map((loc) => (
+        <button key={loc.code} onClick={() => { onChange(loc.code); onClose(); }}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px',
+            background: current === loc.code ? DS.blueDim : 'transparent',
+            color: current === loc.code ? DS.blueBright : DS.t1,
+            border: 'none', borderRadius: 7, cursor: 'pointer',
+            fontSize: 13, fontFamily: "'Inter',sans-serif", fontWeight: current === loc.code ? 700 : 500,
+            textAlign: 'left',
+          }}>
+          <span style={{ fontSize: 16 }}>{loc.flag}</span>
+          <span style={{ flex: 1 }}>{loc.label}</span>
+          {current === loc.code && <span style={{ fontSize: 11 }}>✓</span>}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function AppShell() {
   const {
     activeView, setActiveView, myStudent, levelInfo,
@@ -295,32 +170,32 @@ function AppShell() {
     notifications, unreadCount, notifOpen, setNotifOpen, markAllRead,
     logout, userRole, currentTeacher, theme, toggleTheme,
   } = useApp();
+  const { t, locale, setLocale } = useI18n();
   const isTeacher = userRole === 'teacher';
-  const visibleNav = NAV_ITEMS.filter(item =>
-    item.id === 'teacher' ? isTeacher : true
+  const visibleNav = NAV_ITEMS.filter((item) =>
+    item.role === 'both' ||
+    (isTeacher && item.role === 'teacher') ||
+    (!isTeacher && item.role === 'student')
   );
   const isMobile = useIsMobile();
-  const [sideOpen, setSideOpen] = React.useState(false);
-  const [collapsed, setCollapsed] = React.useState(false);
-  const [profileOpen, setProfileOpen] = React.useState(false);
+  const [sideOpen, setSideOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
   const sw = isMobile ? 252 : collapsed ? 68 : 252;
 
-  const VIEW_TITLE = { dashboard: 'Dashboard', leaderboard: 'Ranking', badges: 'Insignias', progress: 'Progreso', teacher: 'Docente' };
-
-  function go(id) {setActiveView(id);if (isMobile) setSideOpen(false);}
+  function go(id) { setActiveView(id); if (isMobile) setSideOpen(false); }
 
   return (
     <div style={{ display: 'flex', height: '100dvh', background: DS.bg, overflow: 'hidden', position: 'relative' }}>
 
-      {/* Mobile overlay */}
       {isMobile && sideOpen &&
-      <div onClick={() => setSideOpen(false)} style={{
-        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.72)',
-        backdropFilter: 'blur(4px)', zIndex: 90
-      }} />
+        <div onClick={() => setSideOpen(false)} style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.72)',
+          backdropFilter: 'blur(4px)', zIndex: 90
+        }} />
       }
 
-      {/* ── SIDEBAR ── */}
       <aside style={{
         width: sw, flexShrink: 0,
         background: DS.sidebar,
@@ -335,7 +210,6 @@ function AppShell() {
         } : {}),
       }}>
 
-        {/* Brand */}
         <div style={{
           padding: collapsed && !isMobile ? '18px 0' : '18px 18px 16px',
           borderBottom: `1px solid ${DS.bd}`,
@@ -351,18 +225,17 @@ function AppShell() {
             boxShadow: '0 0 20px rgba(79,142,247,0.45)'
           }}>O</div>
           {(!collapsed || isMobile) &&
-          <div>
-              <div className="head" style={{ fontSize: 15, fontWeight: 800, color: DS.t1, letterSpacing: '-.02em' }}>Osyane</div>
+            <div>
+              <div className="head" style={{ fontSize: 15, fontWeight: 800, color: DS.t1, letterSpacing: '-.02em' }}>{t('app.title')}</div>
               <div style={{ fontSize: 10, color: DS.t3, fontWeight: 600, letterSpacing: '.05em' }}>FISEI · UTA</div>
             </div>
           }
         </div>
 
-        {/* Nav */}
         <nav style={{ padding: collapsed && !isMobile ? '12px 8px' : '14px 12px', flex: 1, overflowY: 'auto' }}>
           {(!collapsed || isMobile) &&
-          <div style={{ fontSize: 10, fontWeight: 700, color: DS.t2, letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: 8, paddingLeft: 4 }}>
-              Menú
+            <div style={{ fontSize: 10, fontWeight: 700, color: DS.t2, letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: 8, paddingLeft: 4 }}>
+              {t('nav.menu')}
             </div>
           }
           {visibleNav.map((item) => {
@@ -370,77 +243,70 @@ function AppShell() {
             const Ico = item.icon;
             return (
               <button key={item.id} onClick={() => go(item.id)}
-              title={collapsed && !isMobile ? item.label : ''}
-              className={`nav-link${active ? ' active' : ''}${collapsed && !isMobile ? ' solo' : ''}`}>
+                title={collapsed && !isMobile ? t(item.labelKey) : ''}
+                className={`nav-link${active ? ' active' : ''}${collapsed && !isMobile ? ' solo' : ''}`}>
                 <Ico size={16} />
-                {(!collapsed || isMobile) && <span style={{ flex: 1 }}>{item.label}</span>}
-              </button>);
+                {(!collapsed || isMobile) && <span style={{ flex: 1 }}>{t(item.labelKey)}</span>}
+              </button>
+            );
           })}
           {(!collapsed || isMobile) &&
-          <>
-              <div style={{ fontSize: 10, fontWeight: 700, color: DS.t2, letterSpacing: '.12em', textTransform: 'uppercase', margin: '18px 0 8px', paddingLeft: 4 }}>Opciones</div>
+            <>
+              <div style={{ fontSize: 10, fontWeight: 700, color: DS.t2, letterSpacing: '.12em', textTransform: 'uppercase', margin: '18px 0 8px', paddingLeft: 4 }}>{t('nav.options')}</div>
               {isTeacher && (
                 <button onClick={() => setShowRealNames((v) => !v)} className="nav-link">
                   <IcoEye size={16} />
-                  <span style={{ flex: 1 }}>{showRealNames ? 'Ocultar nombres' : 'Mostrar nombres'}</span>
+                  <span style={{ flex: 1 }}>{showRealNames ? t('nav.hideNames') : t('nav.showNames')}</span>
                 </button>
               )}
             </>
           }
         </nav>
 
-        {/* User card */}
         <div style={{ padding: collapsed && !isMobile ? '12px 8px' : '14px 14px', borderTop: `1px solid ${DS.bd}` }}>
           {collapsed && !isMobile ?
-          <div style={{ display: 'flex', justifyContent: 'center', cursor: 'pointer' }} onClick={() => !isTeacher && setProfileOpen(true)}>
+            <div style={{ display: 'flex', justifyContent: 'center', cursor: 'pointer' }} onClick={() => !isTeacher && setProfileOpen(true)}>
               <Avatar initials={isTeacher ? currentTeacher?.initials : myStudent.initials} size={34} colorIndex={isTeacher ? 5 : 0} />
             </div> :
-
-          isTeacher ? (
-            /* Teacher card */
-            <div style={{ background: 'rgba(167,139,250,0.08)', border: '1px solid rgba(167,139,250,0.2)', borderRadius: 12, padding: '12px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <Avatar initials={currentTeacher?.initials || 'TC'} size={32} colorIndex={5} />
-                <div style={{ flex: 1, overflow: 'hidden' }}>
-                  <div className="head" style={{ fontSize: 12, fontWeight: 700, color: DS.t1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{currentTeacher?.name}</div>
-                  <div style={{ fontSize: 10, marginTop: 1, display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <span style={{ background: 'rgba(167,139,250,0.2)', color: '#a78bfa', borderRadius: 4, padding: '1px 6px', fontSize: 9, fontWeight: 700, letterSpacing: '.05em' }}>DOCENTE</span>
+            isTeacher ? (
+              <div style={{ background: 'rgba(167,139,250,0.08)', border: '1px solid rgba(167,139,250,0.2)', borderRadius: 12, padding: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <Avatar initials={currentTeacher?.initials || 'TC'} size={32} colorIndex={5} />
+                  <div style={{ flex: 1, overflow: 'hidden' }}>
+                    <div className="head" style={{ fontSize: 12, fontWeight: 700, color: DS.t1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{currentTeacher?.name}</div>
+                    <div style={{ fontSize: 10, marginTop: 1, display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <span style={{ background: 'rgba(167,139,250,0.2)', color: '#a78bfa', borderRadius: 4, padding: '1px 6px', fontSize: 9, fontWeight: 700, letterSpacing: '.05em' }}>{t('login.teacher')}</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ) : (
-            /* Student card */
-            <div onClick={() => setProfileOpen(true)} style={{
-              background: 'rgba(255,255,255,0.04)', border: `1px solid ${DS.bd}`,
-              borderRadius: 12, padding: '12px', cursor: 'pointer', transition: 'all .15s'
-            }}
-            onMouseEnter={(e) => {e.currentTarget.style.background = 'rgba(255,255,255,0.07)';e.currentTarget.style.borderColor = DS.bdMd;}}
-            onMouseLeave={(e) => {e.currentTarget.style.background = 'rgba(255,255,255,0.04)';e.currentTarget.style.borderColor = DS.bd;}}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-                <Avatar initials={myStudent.initials} size={32} colorIndex={0} />
-                <div style={{ flex: 1, overflow: 'hidden' }}>
-                  <div className="head" style={{ fontSize: 12, fontWeight: 700, color: DS.t1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{myStudent.name}</div>
-                  <div style={{ fontSize: 10, color: DS.t2, marginTop: 1 }}>N{levelInfo.n} · {levelInfo.title}</div>
+            ) : (
+              <div onClick={() => setProfileOpen(true)} style={{
+                background: 'rgba(255,255,255,0.04)', border: `1px solid ${DS.bd}`,
+                borderRadius: 12, padding: '12px', cursor: 'pointer', transition: 'all .15s'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                  <Avatar initials={myStudent.initials} size={32} colorIndex={0} />
+                  <div style={{ flex: 1, overflow: 'hidden' }}>
+                    <div className="head" style={{ fontSize: 12, fontWeight: 700, color: DS.t1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{myStudent.name}</div>
+                    <div style={{ fontSize: 10, color: DS.t2, marginTop: 1 }}>N{levelInfo.n} · {levelInfo.title}</div>
+                  </div>
                 </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <span className="num" style={{ fontSize: 10, color: DS.goldBright, fontWeight: 700 }}>{myStudent.xp.toLocaleString()} XP</span>
+                  <span style={{ fontSize: 10, color: DS.t2 }}>{Math.round(levelInfo.progress * 100)}%</span>
+                </div>
+                <XPBar progress={levelInfo.progress} height={3} />
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                <span className="num" style={{ fontSize: 10, color: DS.goldBright, fontWeight: 700 }}>{myStudent.xp.toLocaleString()} XP</span>
-                <span style={{ fontSize: 10, color: DS.t2 }}>{Math.round(levelInfo.progress * 100)}%</span>
-              </div>
-              <XPBar progress={levelInfo.progress} height={3} />
-            </div>
-          )
+            )
           }
           {!isMobile &&
-          <button onClick={() => setCollapsed((c) => !c)} style={{
-            width: '100%', marginTop: 8, padding: '7px',
-            borderRadius: 8, border: `1px solid ${DS.bd}`,
-            background: 'transparent', cursor: 'pointer', color: DS.t3,
-            display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all .15s'
-          }}
-          onMouseEnter={(e) => {e.currentTarget.style.background = 'rgba(255,255,255,0.04)';e.currentTarget.style.color = DS.t2;}}
-          onMouseLeave={(e) => {e.currentTarget.style.background = 'transparent';e.currentTarget.style.color = DS.t3;}}>
+            <button onClick={() => setCollapsed((c) => !c)} style={{
+              width: '100%', marginTop: 8, padding: '7px',
+              borderRadius: 8, border: `1px solid ${DS.bd}`,
+              background: 'transparent', cursor: 'pointer', color: DS.t3,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
               <IcoChevron size={13} dir={collapsed ? 'right' : 'left'} />
             </button>
           }
@@ -450,22 +316,17 @@ function AppShell() {
             background: 'transparent', cursor: 'pointer', color: DS.t3,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             gap: 6, fontSize: 11, fontFamily: "'Inter',sans-serif", fontWeight: 500,
-            transition: 'all .15s'
-          }}
-          onMouseEnter={(e) => {e.currentTarget.style.background = 'rgba(244,63,94,0.08)';e.currentTarget.style.borderColor = 'rgba(244,63,94,0.25)';e.currentTarget.style.color = '#f87171';}}
-          onMouseLeave={(e) => {e.currentTarget.style.background = 'transparent';e.currentTarget.style.borderColor = DS.bd;e.currentTarget.style.color = DS.t3;}}>
+          }}>
             <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
             </svg>
-            {(!collapsed || isMobile) && <span>Cerrar sesión</span>}
+            {(!collapsed || isMobile) && <span>{t('nav.logout')}</span>}
           </button>
         </div>
       </aside>
 
-      {/* ── MAIN ── */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
 
-        {/* Topbar */}
         <header style={{
           height: 56, flexShrink: 0,
           background: DS.sidebar,
@@ -474,90 +335,96 @@ function AppShell() {
           transition: 'background .2s, border-color .2s',
         }}>
           {isMobile &&
-          <button onClick={() => setSideOpen((s) => !s)} style={{
-            width: 36, height: 36, border: `1px solid ${DS.bd}`,
-            borderRadius: 8, background: 'rgba(255,255,255,0.05)',
-            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: DS.t2, flexShrink: 0, transition: 'all .15s'
-          }}><IcoMenu size={18} /></button>
+            <button onClick={() => setSideOpen((s) => !s)} style={{
+              width: 36, height: 36, border: `1px solid ${DS.bd}`,
+              borderRadius: 8, background: 'rgba(255,255,255,0.05)',
+              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: DS.t2, flexShrink: 0,
+            }}><IcoMenu size={18} /></button>
           }
           <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
             {!isMobile &&
-            <>
+              <>
                 <span style={{ fontSize: 12, color: DS.t3, fontWeight: 500 }}>FISEI</span>
                 <IcoChevron size={10} dir="right" />
                 <span style={{ fontSize: 12, color: DS.t3, fontWeight: 500 }}>Ing. Software</span>
                 <IcoChevron size={10} dir="right" />
               </>
             }
-            <span className="head" style={{ fontSize: 14, fontWeight: 700, color: DS.t1 }}>{VIEW_TITLE[activeView]}</span>
+            <span className="head" style={{ fontSize: 14, fontWeight: 700, color: DS.t1 }}>
+              {t(`nav.${activeView}`)}
+            </span>
           </div>
           <div style={{ flex: 1 }} />
           {!isMobile &&
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 7,
-            background: 'rgba(255,255,255,0.05)', border: `1px solid ${DS.bd}`,
-            borderRadius: 7, padding: '4px 12px'
-          }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 7,
+              background: 'rgba(255,255,255,0.05)', border: `1px solid ${DS.bd}`,
+              borderRadius: 7, padding: '4px 12px'
+            }}>
               <div className="pulse-dot" style={{ width: 6, height: 6, borderRadius: '50%', background: DS.green, boxShadow: `0 0 8px ${DS.green}` }} />
               <span style={{ fontSize: 11, color: DS.t2, fontWeight: 600 }}>2025‑A</span>
             </div>
           }
           <div style={{ width: 1, height: 24, background: DS.bd }} />
 
-          {/* Theme toggle */}
-          <button onClick={toggleTheme} title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'} style={{
+          <button onClick={() => setLangOpen((v) => !v)} title={t('common.language')} style={{
+            width: 36, height: 36, border: `1px solid ${DS.bd}`,
+            borderRadius: 9, background: 'transparent',
+            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: DS.t2, position: 'relative',
+          }}>
+            <IcoGlobe size={16} />
+            <span style={{ position: 'absolute', bottom: -2, right: -2, fontSize: 9 }}>{LOCALES.find((l) => l.code === locale)?.flag}</span>
+          </button>
+
+          <button onClick={toggleTheme} title={theme === 'dark' ? t('common.light') : t('common.dark')} style={{
             width: 36, height: 36, border: `1px solid ${DS.bd}`,
             borderRadius: 9, background: 'transparent',
             cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
             color: theme === 'dark' ? DS.gold : DS.purple, transition: 'all .2s',
-          }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = theme === 'dark' ? DS.goldDim : 'rgba(124,58,237,0.1)'; e.currentTarget.style.borderColor = theme === 'dark' ? `${DS.gold}55` : 'rgba(124,58,237,0.3)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = DS.bd; }}>
+          }}>
             {theme === 'dark' ? <IcoSun size={16} /> : <IcoMoon size={16} />}
           </button>
 
-          {/* Bell */}
           <div style={{ position: 'relative' }}>
-            <button onClick={() => {setNotifOpen((v) => !v);markAllRead();}} style={{
+            <button onClick={() => { setNotifOpen((v) => !v); markAllRead(); }} style={{
               position: 'relative', width: 36, height: 36,
               border: `1px solid ${notifOpen ? DS.blue + '55' : DS.bd}`,
               borderRadius: 9,
               background: notifOpen ? DS.blueDim : 'rgba(255,255,255,0.05)',
               cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: notifOpen ? DS.blueBright : DS.t2, transition: 'all .15s'
+              color: notifOpen ? DS.blueBright : DS.t2,
             }}>
               <IcoBell size={16} />
               {unreadCount > 0 &&
-              <span className="pulse-dot" style={{
-                position: 'absolute', top: 7, right: 7,
-                width: 7, height: 7, borderRadius: '50%',
-                background: DS.gold, border: `2px solid ${DS.sidebar}`,
-                boxShadow: `0 0 8px ${DS.gold}`
-              }} />
+                <span className="pulse-dot" style={{
+                  position: 'absolute', top: 7, right: 7,
+                  width: 7, height: 7, borderRadius: '50%',
+                  background: DS.gold, border: `2px solid ${DS.sidebar}`,
+                  boxShadow: `0 0 8px ${DS.gold}`
+                }} />
               }
             </button>
             {notifOpen &&
-            <div style={{
-              position: 'fixed', top: 58, right: 20, width: 340,
-              background: DS.card, border: `1px solid ${DS.bdMd}`,
-              borderRadius: 16, boxShadow: '0 24px 64px rgba(0,0,0,0.65)',
-              zIndex: 2000, overflow: 'hidden',
-            }}>
+              <div style={{
+                position: 'fixed', top: 58, right: 20, width: 340,
+                background: DS.card, border: `1px solid ${DS.bdMd}`,
+                borderRadius: 16, boxShadow: '0 24px 64px rgba(0,0,0,0.65)',
+                zIndex: 2000, overflow: 'hidden',
+              }}>
                 <div style={{ padding: '14px 18px 12px', borderBottom: `1px solid ${DS.bd}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span className="head" style={{ fontWeight: 700, fontSize: 14, color: DS.t1 }}>Notificaciones</span>
+                  <span className="head" style={{ fontWeight: 700, fontSize: 14, color: DS.t1 }}>{t('notifications.title')}</span>
                   <button onClick={() => setNotifOpen(false)} style={{ background: 'rgba(255,255,255,0.07)', border: 'none', borderRadius: 6, cursor: 'pointer', color: DS.t2, display: 'flex', padding: 5 }}><IcoClose size={13} /></button>
                 </div>
-                {notifications.map((n, i) =>
-              <div key={n.id} style={{
-                display: 'flex', gap: 12, padding: '12px 18px',
-                background: n.unread ? `${DS.blue}0a` : 'transparent',
-                borderBottom: i < notifications.length - 1 ? `1px solid ${DS.bd}` : 'none',
-                transition: 'background .12s', cursor: 'default'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.03)'}
-              onMouseLeave={(e) => e.currentTarget.style.background = n.unread ? `${DS.blue}0a` : 'transparent'}>
-                
+                {notifications.length === 0 ? (
+                  <div style={{ padding: 24, textAlign: 'center', fontSize: 12, color: DS.t2 }}>{t('notifications.empty')}</div>
+                ) : notifications.map((n, i) => (
+                  <div key={n.id} style={{
+                    display: 'flex', gap: 12, padding: '12px 18px',
+                    background: n.unread ? `${DS.blue}0a` : 'transparent',
+                    borderBottom: i < notifications.length - 1 ? `1px solid ${DS.bd}` : 'none',
+                  }}>
                     <div style={{ width: 34, height: 34, borderRadius: '50%', background: DS.card2, border: `1px solid ${DS.bd}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0 }}>{n.icon}</div>
                     <div style={{ flex: 1 }}>
                       <p style={{ margin: 0, fontSize: 12, color: DS.t1, lineHeight: 1.45, fontWeight: n.unread ? 600 : 400 }}>{n.text}</p>
@@ -565,62 +432,59 @@ function AppShell() {
                     </div>
                     {n.unread && <div style={{ width: 7, height: 7, borderRadius: '50%', background: DS.blue, flexShrink: 0, marginTop: 8, boxShadow: `0 0 8px ${DS.blue}` }} />}
                   </div>
-              )}
+                ))}
                 <div style={{ padding: '10px 18px', textAlign: 'center', borderTop: `1px solid ${DS.bd}` }}>
-                  <button onClick={() => setNotifOpen(false)} style={{ fontSize: 12, color: DS.blueBright, fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Inter',sans-serif" }}>Ver todas →</button>
+                  <button onClick={() => setNotifOpen(false)} style={{ fontSize: 12, color: DS.blueBright, fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Inter',sans-serif" }}>{t('notifications.viewAll')}</button>
                 </div>
               </div>
             }
           </div>
 
-          {/* Avatar */}
-          <div onClick={() => setProfileOpen(true)} style={{ cursor: 'pointer' }}>
-            <Avatar initials={myStudent.initials} size={32} colorIndex={0} />
+          <div onClick={() => !isTeacher && setProfileOpen(true)} style={{ cursor: 'pointer' }}>
+            <Avatar initials={isTeacher ? currentTeacher?.initials || 'TC' : myStudent.initials} size={32} colorIndex={isTeacher ? 5 : 0} />
           </div>
         </header>
 
-        {/* Content — key triggers rise-in on view change */}
         <main style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
           <div key={activeView} className="rise-in">
-            {activeView === 'dashboard' && <ViewDashboard />}
+            {activeView === 'dashboard'   && <ViewDashboard />}
             {activeView === 'leaderboard' && <ViewLeaderboard />}
-            {activeView === 'badges' && <ViewBadges />}
-            {activeView === 'progress' && <ViewProgress />}
-            {activeView === 'teacher' && <ViewTeacher />}
+            {activeView === 'badges'      && <ViewBadges />}
+            {activeView === 'progress'    && <ViewProgress />}
+            {activeView === 'tasks'       && <ViewStudentTasks />}
+            {activeView === 'teacher'     && <ViewTeacher />}
           </div>
         </main>
 
-        {/* Mobile bottom nav */}
         {isMobile &&
-        <nav style={{ display: 'flex', borderTop: `1px solid ${DS.bd}`, background: DS.sidebar, padding: '6px 0 env(safe-area-inset-bottom)', flexShrink: 0 }}>
+          <nav style={{ display: 'flex', borderTop: `1px solid ${DS.bd}`, background: DS.sidebar, padding: '6px 0 env(safe-area-inset-bottom)', flexShrink: 0 }}>
             {visibleNav.map((item) => {
-            const active = activeView === item.id;
-            const Ico = item.icon;
-            return (
-              <button key={item.id} onClick={() => go(item.id)} style={{
-                flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
-                gap: 3, padding: '6px 4px', border: 'none', background: 'none', cursor: 'pointer',
-                color: active ? DS.blueBright : DS.t3, transition: 'color .15s'
-              }}>
+              const active = activeView === item.id;
+              const Ico = item.icon;
+              return (
+                <button key={item.id} onClick={() => go(item.id)} style={{
+                  flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
+                  gap: 3, padding: '6px 4px', border: 'none', background: 'none', cursor: 'pointer',
+                  color: active ? DS.blueBright : DS.t3, transition: 'color .15s'
+                }}>
                   <Ico size={20} />
-                  <span style={{ fontSize: 9, fontWeight: active ? 700 : 500, fontFamily: "'Inter',sans-serif" }}>{item.label}</span>
-                </button>);
-          })}
+                  <span style={{ fontSize: 9, fontWeight: active ? 700 : 500, fontFamily: "'Inter',sans-serif" }}>{t(item.labelKey)}</span>
+                </button>
+              );
+            })}
           </nav>
         }
       </div>
 
       {toast && <Toast key={toast.id} message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       <ProfileModal open={profileOpen} onClose={() => setProfileOpen(false)} />
-    </div>);
-
+      {langOpen && <div onClick={() => setLangOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 1500 }} />}
+      <LanguageMenu open={langOpen} onClose={() => setLangOpen(false)} current={locale} onChange={setLocale} />
+    </div>
+  );
 }
 
-function AppWithLogin() {
-  const { loggedIn, login } = useApp();
-  if (!loggedIn) return <LoginScreen onLogin={login} />;
-  return <AppShell />;
+export default function App() {
+  const { loggedIn } = useApp();
+  return loggedIn ? <AppShell /> : <LoginScreen />;
 }
-
-function App() {return <AppProvider><AppWithLogin /></AppProvider>;}
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);

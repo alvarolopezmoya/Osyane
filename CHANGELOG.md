@@ -6,6 +6,42 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ---
 
+## [2.0.0] — 2026-05-16
+
+### 🚀 Migración mayor a Vite + React (ESM)
+- Reescritura de toda la app: de Babel-standalone en navegador a **Vite + ESM**.
+- Bundle de producción: ~290 KB gzipped (charts + xlsx + app).
+- Build con code-splitting automático (`react`, `charts`, `xlsx` en chunks separados).
+- **PWA instalable** vía `vite-plugin-pwa` con service worker y precaché offline.
+
+### ✨ Añadido
+- **Persistencia con `localStorage`**: estudiantes, tareas, entregas, notificaciones, sesión, tema e idioma sobreviven recargas.
+- **Vista de tareas para estudiantes** (`src/views/StudentTasks.jsx`): listado con contador hasta deadline (color-coded), entrega con nota, filtros por estado y auto-otorgación de XP al aprobar.
+- **Flujo de entregas (submissions)**: estudiante entrega → docente aprueba/rechaza → XP se otorga automáticamente al aprobar.
+- **Pestaña "Entregas"** en el panel del docente con badge de contador de pendientes.
+- **i18n (es/en)** completo con detección automática del idioma del navegador y selector en topbar.
+- **Tests con Vitest**: 39 tests cubriendo `getLevelInfo`, ranking, validación de tareas y cálculos de deadline.
+- **Stubs documentados** con TODOs para integrar Firebase/Supabase/Express, OAuth UTA (MSAL/Azure AD) y notificaciones WebSocket/SSE.
+- Botón placeholder "Ingresar con cuenta UTA" en el login (deshabilitado hasta configurar SSO).
+- Validación de tareas centralizada en `utils/tasks.js` (XP > 0, ≤ 1000, asignatura válida, fecha parseable, título no vacío).
+
+### 🎨 Cambiado
+- **Estructura de archivos** reorganizada: `src/components/`, `src/views/`, `src/utils/`, `src/i18n/`, `src/services/`, `tests/`.
+- Modo claro/oscuro ahora persiste en `localStorage` (clave `osyane:theme`).
+- Login con flujo más rápido (350ms vs. 650ms).
+
+### 🛠️ Tooling
+- Scripts npm: `dev`, `build`, `preview`, `test`, `test:watch`, `deploy`.
+- Configuración de despliegue a GitHub Pages con `gh-pages`.
+- `.gitignore` actualizado con `dist/`, `dev-dist/`, `coverage/`.
+
+### ❌ Eliminado
+- Dependencias CDN (`<script>` tags de React UMD, Babel, Recharts UMD, etc.).
+- Compilación en navegador con `@babel/standalone` (incompatible con producción real).
+- Archivos legacy: `src/icons.jsx`, `src/ui.jsx`, `src/charts.jsx`, `src/data.jsx`, `src/view-*.jsx`.
+
+---
+
 ## [1.0.0] — 2025-05-14
 
 ### ✨ Añadido

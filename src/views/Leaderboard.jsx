@@ -1,8 +1,16 @@
-// ─── Leaderboard View — Premium ──────────────────────────────────────────────
+import { useEffect, useState } from 'react';
+import { useApp } from '../store.jsx';
+import { useI18n } from '../i18n/index.jsx';
+import { COMPETENCIAS_DATA } from '../data.js';
+import { getLevelInfo } from '../utils/levels.js';
+import { DS } from '../components/ds.js';
+import { Avatar, Input, RankBadge, SectionHeader } from '../components/UI.jsx';
+import { IcoSearch } from '../components/Icons.jsx';
+import { CompetenciasRadar } from '../components/Charts.jsx';
 
-function PodiumItem({ s, height, label, medal, maskName, rank }) {
-  const [grown, setGrown] = React.useState(false);
-  React.useEffect(() => { const t = setTimeout(() => setGrown(true), rank * 160 + 100); return () => clearTimeout(t); }, []);
+function PodiumItem({ s, height, medal, maskName, rank }) {
+  const [grown, setGrown] = useState(false);
+  useEffect(() => { const x = setTimeout(() => setGrown(true), rank * 160 + 100); return () => clearTimeout(x); }, [rank]);
   const cfgs = {
     1: { bg: 'linear-gradient(180deg,#b45309 0%,#d97706 40%,#f59e0b 100%)', glow: 'rgba(245,158,11,0.45)', top: '#fef3c7' },
     2: { bg: 'linear-gradient(180deg,#1e293b 0%,#334155 100%)', glow: 'rgba(71,85,105,0.28)', top: '#cbd5e1' },
@@ -31,7 +39,6 @@ function PodiumItem({ s, height, label, medal, maskName, rank }) {
           color: isFirst ? 'transparent' : DS.t2,
         }}>{s.xp.toLocaleString()} XP</div>
       </div>
-      {/* Pillar */}
       <div style={{
         height: grown ? height : 0, background: c.bg,
         borderRadius: '10px 10px 0 0',
@@ -48,11 +55,12 @@ function PodiumItem({ s, height, label, medal, maskName, rank }) {
   );
 }
 
-function ViewLeaderboard() {
+export default function ViewLeaderboard() {
   const { leaderboard, myRank, maskName } = useApp();
-  const [search, setSearch] = React.useState('');
+  const { t } = useI18n();
+  const [search, setSearch] = useState('');
   const half = Math.ceil(leaderboard.length / 2);
-  const filtered = leaderboard.filter(s => maskName(s).toLowerCase().includes(search.toLowerCase()));
+  const filtered = leaderboard.filter((s) => maskName(s).toLowerCase().includes(search.toLowerCase()));
   const top3 = leaderboard.slice(0, 3);
 
   const C = { background: DS.card, border: `1px solid ${DS.bd}`, borderRadius: 16, boxShadow: '0 4px 20px rgba(0,0,0,0.38)', overflow: 'hidden' };
@@ -60,32 +68,28 @@ function ViewLeaderboard() {
   return (
     <div className="rise-in" style={{ padding: 'clamp(14px,3vw,28px)', maxWidth: 1140, margin: '0 auto' }}>
 
-      {/* ── Podium ── */}
       <div style={{ ...C, marginBottom: 18, overflow: 'visible' }}>
         <div style={{ padding: '24px 24px 0', borderBottom: `1px solid ${DS.bd}`, background: DS.card }}>
-          <SectionHeader title="Podio del grupo" sub="Ingeniería en Software · Semestre 2025-A" />
+          <SectionHeader title="Podio del grupo" sub="Ingeniería en Software · 2025-A" />
         </div>
         <div style={{
           padding: '24px 24px 0',
           background: 'linear-gradient(180deg,rgba(79,142,247,0.04) 0%, transparent 60%)',
           display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: 14,
         }}>
-          <PodiumItem s={top3[1]} height={110} label="2°" medal="🥈" maskName={maskName} rank={2} />
-          <PodiumItem s={top3[0]} height={155} label="1°" medal="🥇" maskName={maskName} rank={1} />
-          <PodiumItem s={top3[2]} height={86}  label="3°" medal="🥉" maskName={maskName} rank={3} />
+          {top3[1] && <PodiumItem s={top3[1]} height={110} medal="🥈" maskName={maskName} rank={2} />}
+          {top3[0] && <PodiumItem s={top3[0]} height={155} medal="🥇" maskName={maskName} rank={1} />}
+          {top3[2] && <PodiumItem s={top3[2]} height={86}  medal="🥉" maskName={maskName} rank={3} />}
         </div>
       </div>
 
-      {/* ── Table + Radar ── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 340px', gap: 18, alignItems: 'start' }}>
 
-        {/* Ranking table */}
         <div style={C}>
           <div style={{ padding: '14px 18px', borderBottom: `1px solid ${DS.bd}`, display: 'flex', gap: 12, alignItems: 'center' }}>
-            <Input placeholder="Buscar estudiante…" value={search} onChange={e => setSearch(e.target.value)} icon={<IcoSearch size={15} />} style={{ flex: 1 }} />
-            <span style={{ fontSize: 12, color: DS.t2, whiteSpace: 'nowrap' }}>{filtered.length} estudiantes</span>
+            <Input placeholder={t('common.search')} value={search} onChange={(e) => setSearch(e.target.value)} icon={<IcoSearch size={15} />} style={{ flex: 1 }} />
+            <span style={{ fontSize: 12, color: DS.t2, whiteSpace: 'nowrap' }}>{filtered.length} {t('common.students')}</span>
           </div>
-          {/* Header */}
           <div style={{
             display: 'grid', gridTemplateColumns: '46px 1fr 100px 70px 70px',
             padding: '9px 18px', borderBottom: `1px solid ${DS.bd}`,
@@ -96,7 +100,7 @@ function ViewLeaderboard() {
             <span style={{ textAlign: 'center' }}>Nivel</span>
             <span style={{ textAlign: 'center' }}>Racha</span>
           </div>
-          {filtered.map((s, i) => {
+          {filtered.map((s) => {
             const lvl = getLevelInfo(s.xp);
             const isBottom = s.rank > half;
             return (
@@ -136,15 +140,14 @@ function ViewLeaderboard() {
             );
           })}
           <div style={{ padding: '10px 18px', textAlign: 'center', fontSize: 11, color: DS.t2, borderTop: `1px solid ${DS.bd}`, background: DS.card2 }}>
-            Tu posición: <strong style={{ color: DS.blueBright }}>#{myRank}</strong> · La mitad inferior está oculta para otros
+            Tu posición: <strong style={{ color: DS.blueBright }}>#{myRank}</strong>
           </div>
         </div>
 
-        {/* Right panel */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           <div style={{ ...C, padding: '20px 16px 10px' }}>
             <SectionHeader title="Competencias" sub="Tu perfil técnico" />
-            <CompetenciasRadar height={240} />
+            <CompetenciasRadar data={COMPETENCIAS_DATA} height={240} />
           </div>
           <div style={{ ...C, padding: 20 }}>
             <SectionHeader title="Dominio por área" sub="Vs. promedio (68%)" />
@@ -176,5 +179,3 @@ function ViewLeaderboard() {
     </div>
   );
 }
-
-Object.assign(window, { ViewLeaderboard });

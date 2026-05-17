@@ -1,17 +1,10 @@
 {
-  "name": "osyanne",
-  "version": "1.0.0",
+  "name": "osyane",
+  "version": "2.0.0",
   "private": true,
-  "description": "Sistema de Gamificación Académica para FISEI · UTA — niveles, XP, insignias y rankings",
-  "keywords": [
-    "gamification",
-    "education",
-    "react",
-    "uta",
-    "fisei",
-    "dashboard",
-    "edtech"
-  ],
+  "type": "module",
+  "description": "Sistema de Gamificación Académica para FISEI · UTA — niveles, XP, insignias, rankings y tareas",
+  "keywords": ["gamification", "education", "react", "vite", "uta", "fisei", "edtech", "pwa"],
   "author": "Osyan Granda <ogranda8821@uta.edu.ec>",
   "license": "MIT",
   "homepage": "https://github.com/alvarolopezmoya/Osyane",
@@ -23,8 +16,26 @@
     "url": "https://github.com/alvarolopezmoya/Osyane/issues"
   },
   "scripts": {
-    "start": "npx http-server -p 8080 -o",
-    "dev": "npx http-server -p 8080 -o",
-    "serve": "python3 -m http.server 8080"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "deploy": "npm run build && gh-pages -d dist"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "recharts": "^2.12.7",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "gh-pages": "^6.2.0",
+    "jsdom": "^25.0.1",
+    "vite": "^6.0.5",
+    "vite-plugin-pwa": "^0.21.1",
+    "vitest": "^2.1.8"
   }
 }
