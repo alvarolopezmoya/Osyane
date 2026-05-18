@@ -1,6 +1,10 @@
-// Datos semilla (mock). En producción esto se reemplaza por el servicio `api.js`.
+// Datos semilla (mock). En modo live se reemplaza por queries a Supabase.
+import type {
+  Badge, Subject, Student, Teacher, Task, Notification,
+  XpDataPoint, SubjectXp, Activity, Competencia,
+} from './types.js';
 
-export const BADGES = [
+export const BADGES: Badge[] = [
   { id: 'b01', icon: '🔥', name: 'Primera Llama',      desc: 'Completaste tu primera tarea.',         cat: 'Inicio',     xp: 50,  rare: false },
   { id: 'b02', icon: '⚡', name: 'Velocista',           desc: 'Entregaste 3 tareas antes del plazo.',  cat: 'Constancia', xp: 80,  rare: false },
   { id: 'b03', icon: '🎯', name: 'Precisión',           desc: 'Nota perfecta en un examen.',           cat: 'Excelencia', xp: 120, rare: true  },
@@ -18,7 +22,7 @@ export const BADGES = [
   { id: 'b15', icon: '🏅', name: 'Constancia',          desc: '30 días activo en la plataforma.',      cat: 'Constancia', xp: 200, rare: false },
 ];
 
-export const SUBJECTS = [
+export const SUBJECTS: Subject[] = [
   { id: 's1', name: 'Programación OO',   color: '#1a56c4' },
   { id: 's2', name: 'Base de Datos',     color: '#1f7a4a' },
   { id: 's3', name: 'Redes',             color: '#b87d00' },
@@ -26,7 +30,7 @@ export const SUBJECTS = [
   { id: 's5', name: 'Cálculo',           color: '#7c3aed' },
 ];
 
-export const STUDENTS = [
+export const STUDENTS: Student[] = [
   { id: 'u01', name: 'Osyan Granda',     initials: 'OG', email: 'ogranda8821@uta.edu.ec', xp: 4580, earnedBadges: ['b01','b02','b03','b05','b06','b08','b10'], streak: 12, isMe: true  },
   { id: 'u02', name: 'Valentina Torres', initials: 'VT', email: 'vtorres5543@uta.edu.ec', xp: 5210, earnedBadges: ['b01','b02','b04','b05','b06','b07','b09','b11'], streak: 18, isMe: false },
   { id: 'u03', name: 'Sebastián Mora',   initials: 'SM', email: 'smora6612@uta.edu.ec',   xp: 4990, earnedBadges: ['b01','b03','b06','b10','b13'], streak: 9,  isMe: false },
@@ -44,14 +48,14 @@ export const STUDENTS = [
   { id: 'u15', name: 'Héctor Muñoz',     initials: 'HM', email: 'hmunoz9913@uta.edu.ec',  xp: 1650, earnedBadges: ['b01'], streak: 0,  isMe: false },
 ];
 
-export const XP_HISTORY = [
+export const XP_HISTORY: XpDataPoint[] = [
   { week: 'S1', xp: 180 }, { week: 'S2', xp: 220 }, { week: 'S3', xp: 310 },
   { week: 'S4', xp: 290 }, { week: 'S5', xp: 410 }, { week: 'S6', xp: 380 },
   { week: 'S7', xp: 460 }, { week: 'S8', xp: 520 }, { week: 'S9', xp: 490 },
   { week: 'S10', xp: 620 },{ week: 'S11', xp: 570 },{ week: 'S12', xp: 730 },
 ];
 
-export const SUBJECT_XP = [
+export const SUBJECT_XP: SubjectXp[] = [
   { subject: 'Prog. OO',   xp: 1420, maxXp: 1800 },
   { subject: 'Base Datos', xp: 980,  maxXp: 1500 },
   { subject: 'Redes',      xp: 760,  maxXp: 1200 },
@@ -59,7 +63,7 @@ export const SUBJECT_XP = [
   { subject: 'Cálculo',    xp: 320,  maxXp: 800  },
 ];
 
-export const ACTIVITY_FEED = [
+export const ACTIVITY_FEED: Activity[] = [
   { id: 'a1', type: 'xp',    icon: '⚡', text: 'Ganaste 120 XP en "Patrones de Diseño"',       time: 'hace 2 h',  xp: +120 },
   { id: 'a2', type: 'badge', icon: '🔥', text: 'Desbloqueaste la insignia "Primera Llama"',     time: 'hace 5 h',  xp: null },
   { id: 'a3', type: 'rank',  icon: '📈', text: 'Subiste al puesto #1 en Programación OO',       time: 'ayer',      xp: null },
@@ -68,18 +72,18 @@ export const ACTIVITY_FEED = [
   { id: 'a6', type: 'xp',    icon: '⚡', text: 'Ganaste 200 XP en proyecto "API REST"',         time: 'hace 3 d',  xp: +200 },
 ];
 
-export const TEACHERS = [
+export const TEACHERS: Teacher[] = [
   { id: 't01', name: 'Dr. Carlos Pinto',   initials: 'CP', email: 'cpinto@uta.edu.ec',   role: 'teacher' },
   { id: 't02', name: 'Ing. María Salinas', initials: 'MS', email: 'msalinas@uta.edu.ec', role: 'teacher' },
 ];
 
-export const INITIAL_TASKS = [
+export const INITIAL_TASKS: Task[] = [
   { id: 'tk01', title: 'Proyecto API REST',       desc: 'Implementar API RESTful con Node.js y Express. Incluir autenticación JWT.', subject: 'Ing. de Software', xp: 200, deadline: '2026-06-15' },
   { id: 'tk02', title: 'Normalización BD',         desc: 'Normalizar el esquema de base de datos hasta la Tercera Forma Normal (3FN).', subject: 'Base de Datos',    xp: 100, deadline: '2026-06-10' },
   { id: 'tk03', title: 'Algoritmos de Ordenación', desc: 'Implementar QuickSort y MergeSort. Análisis de complejidad O(n).',         subject: 'Programación OO',  xp: 80,  deadline: '2026-06-20' },
 ];
 
-export const INITIAL_NOTIFICATIONS = [
+export const INITIAL_NOTIFICATIONS: Notification[] = [
   { id: 'n1', icon: '⚡', text: 'Ganaste 120 XP en "Patrones de Diseño"', time: 'hace 2 h', unread: true },
   { id: 'n2', icon: '🏅', text: 'Nueva insignia desbloqueada: "Precisión"', time: 'hace 5 h', unread: true },
   { id: 'n3', icon: '📈', text: 'Subiste al puesto #1 en Programación OO',  time: 'ayer',    unread: true },
@@ -87,7 +91,7 @@ export const INITIAL_NOTIFICATIONS = [
   { id: 'n5', icon: '🎯', text: 'Nuevo desafío: "Semana de Algoritmos"',    time: 'hace 2 d',unread: false },
 ];
 
-export const COMPETENCIAS_DATA = [
+export const COMPETENCIAS_DATA: Competencia[] = [
   { area: 'Algoritmos',     value: 78 },
   { area: 'Bases de Datos', value: 65 },
   { area: 'POO',            value: 88 },
