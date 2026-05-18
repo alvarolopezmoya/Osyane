@@ -7,6 +7,7 @@ import { usePersistedState, load } from './utils/storage.js';
 import { DS, THEMES, applyTheme } from './components/ds.js';
 import { loginLocal } from './services/auth.js';
 import { emit as emitNotif, makeNotification } from './services/notifications.js';
+import { burstGold, burstBlue, burstRare } from './utils/confetti.js';
 
 const AppContext = createContext(null);
 
@@ -94,7 +95,18 @@ export function AppProvider({ children }) {
 
   // ── XP / Badges ──────────────────────────────────────────────────────────
   function awardXp(studentId, amount, reason) {
-    setStudents((prev) => prev.map((s) => (s.id === studentId ? { ...s, xp: s.xp + amount } : s)));
+    setStudents((prev) => prev.map((s) => {
+      if (s.id !== studentId) return s;
+      const oldLevel = getLevelInfo(s.xp).n;
+      const newXp    = s.xp + amount;
+      const newLevel = getLevelInfo(newXp).n;
+      // Si el usuario soy yo y subo de nivel → confetti azul épico, si no, dorado normal.
+      if (s.isMe) {
+        if (newLevel > oldLevel) burstBlue();
+        else burstGold();
+      }
+      return { ...s, xp: newXp };
+    }));
     pushNotif(makeNotification(`+${amount} XP — ${reason}`, '⚡'));
     showToastMsg(`+${amount} XP otorgado — ${reason}`, 'gold');
     emitNotif({ type: 'xp.awarded', studentId, amount, reason });
@@ -107,6 +119,10 @@ export function AppProvider({ children }) {
         : s
     ));
     const badge = BADGES.find((b) => b.id === badgeId);
+    const recipient = students.find((s) => s.id === studentId);
+    if (recipient?.isMe) {
+      badge?.rare ? burstRare() : burstGold();
+    }
     pushNotif(makeNotification(`Insignia desbloqueada: "${badge?.name}"`, '🏅'));
     showToastMsg(`Insignia "${badge?.name}" otorgada`, 'success');
     emitNotif({ type: 'badge.earned', studentId, badgeId });

@@ -1,20 +1,38 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { useApp } from './store.jsx';
 import { useI18n, LOCALES } from './i18n/index.jsx';
 import { BADGES } from './data.js';
 import { DS } from './components/ds.js';
 import { Avatar, XPBar, Toast } from './components/UI.jsx';
+import { ViewSkeleton } from './components/Skeleton.jsx';
 import {
   IcoDashboard, IcoRanking, IcoBadge, IcoProgress, IcoTeacher, IcoTasks,
-  IcoBell, IcoEye, IcoChevron, IcoClose, IcoMenu, IcoSun, IcoMoon, IcoGlobe,
+  IcoBell, IcoEye, IcoChevron, IcoClose, IcoMenu, IcoSun, IcoMoon, IcoGlobe, IcoSearch,
 } from './components/Icons.jsx';
 import LoginScreen from './views/Login.jsx';
-import ViewDashboard from './views/Dashboard.jsx';
-import ViewLeaderboard from './views/Leaderboard.jsx';
-import ViewBadges from './views/Badges.jsx';
-import ViewProgress from './views/Progress.jsx';
-import ViewTeacher from './views/Teacher.jsx';
-import ViewStudentTasks from './views/StudentTasks.jsx';
+
+// Vistas cargadas bajo demanda — Recharts (~565 KB) y xlsx (~283 KB) solo se descargan
+// cuando el usuario realmente abre las pantallas que los usan.
+const ViewDashboard     = lazy(() => import('./views/Dashboard.jsx'));
+const ViewLeaderboard   = lazy(() => import('./views/Leaderboard.jsx'));
+const ViewBadges        = lazy(() => import('./views/Badges.jsx'));
+const ViewProgress      = lazy(() => import('./views/Progress.jsx'));
+const ViewTeacher       = lazy(() => import('./views/Teacher.jsx'));
+const ViewStudentTasks  = lazy(() => import('./views/StudentTasks.jsx'));
+const CommandPalette    = lazy(() => import('./components/CommandPalette.jsx'));
+
+function useCmdK(setOpen) {
+  useEffect(() => {
+    function onKey(e) {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setOpen((v) => !v);
+      }
+    }
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [setOpen]);
+}
 
 const NAV_ITEMS = [
   { id: 'dashboard',   labelKey: 'nav.dashboard',   icon: IcoDashboard, role: 'student' },
@@ -182,6 +200,8 @@ function AppShell() {
   const [collapsed, setCollapsed] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  useCmdK(setPaletteOpen);
   const sw = isMobile ? 252 : collapsed ? 68 : 252;
 
   function go(id) { setActiveView(id); if (isMobile) setSideOpen(false); }
@@ -335,12 +355,16 @@ function AppShell() {
           transition: 'background .2s, border-color .2s',
         }}>
           {isMobile &&
-            <button onClick={() => setSideOpen((s) => !s)} style={{
-              width: 36, height: 36, border: `1px solid ${DS.bd}`,
-              borderRadius: 8, background: 'rgba(255,255,255,0.05)',
-              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: DS.t2, flexShrink: 0,
-            }}><IcoMenu size={18} /></button>
+            <button
+              onClick={() => setSideOpen((s) => !s)}
+              aria-label={sideOpen ? 'Cerrar menú' : 'Abrir menú'}
+              aria-expanded={sideOpen}
+              style={{
+                width: 36, height: 36, border: `1px solid ${DS.bd}`,
+                borderRadius: 8, background: 'rgba(255,255,255,0.05)',
+                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: DS.t2, flexShrink: 0,
+              }}><IcoMenu size={18} /></button>
           }
           <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
             {!isMobile &&
@@ -356,6 +380,34 @@ function AppShell() {
             </span>
           </div>
           <div style={{ flex: 1 }} />
+
+          {!isMobile && (
+            <button
+              onClick={() => setPaletteOpen(true)}
+              aria-label="Abrir paleta de comandos (Ctrl+K)"
+              style={{
+                display: 'flex', alignItems: 'center', gap: 8,
+                padding: '5px 10px 5px 12px',
+                background: 'rgba(255,255,255,0.04)',
+                border: `1px solid ${DS.bd}`, borderRadius: 8,
+                color: DS.t2, cursor: 'pointer', fontSize: 12,
+                fontFamily: "'Inter', sans-serif",
+                transition: 'all .15s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.borderColor = DS.bdMd; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.borderColor = DS.bd; }}
+            >
+              <span style={{ display: 'flex' }}><IcoSearch size={13} /></span>
+              <span style={{ color: DS.t3 }}>Buscar…</span>
+              <kbd style={{
+                fontSize: 9, fontWeight: 700, color: DS.t3,
+                background: DS.card2, border: `1px solid ${DS.bd}`,
+                borderRadius: 4, padding: '1px 5px',
+                fontFamily: "'JetBrains Mono', monospace",
+              }}>⌘K</kbd>
+            </button>
+          )}
+
           {!isMobile &&
             <div style={{
               display: 'flex', alignItems: 'center', gap: 7,
@@ -368,37 +420,52 @@ function AppShell() {
           }
           <div style={{ width: 1, height: 24, background: DS.bd }} />
 
-          <button onClick={() => setLangOpen((v) => !v)} title={t('common.language')} style={{
-            width: 36, height: 36, border: `1px solid ${DS.bd}`,
-            borderRadius: 9, background: 'transparent',
-            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: DS.t2, position: 'relative',
-          }}>
+          <button
+            onClick={() => setLangOpen((v) => !v)}
+            title={t('common.language')}
+            aria-label={t('common.language')}
+            aria-haspopup="menu"
+            aria-expanded={langOpen}
+            style={{
+              width: 36, height: 36, border: `1px solid ${DS.bd}`,
+              borderRadius: 9, background: 'transparent',
+              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: DS.t2, position: 'relative',
+            }}>
             <IcoGlobe size={16} />
-            <span style={{ position: 'absolute', bottom: -2, right: -2, fontSize: 9 }}>{LOCALES.find((l) => l.code === locale)?.flag}</span>
+            <span aria-hidden="true" style={{ position: 'absolute', bottom: -2, right: -2, fontSize: 9 }}>{LOCALES.find((l) => l.code === locale)?.flag}</span>
           </button>
 
-          <button onClick={toggleTheme} title={theme === 'dark' ? t('common.light') : t('common.dark')} style={{
-            width: 36, height: 36, border: `1px solid ${DS.bd}`,
-            borderRadius: 9, background: 'transparent',
-            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: theme === 'dark' ? DS.gold : DS.purple, transition: 'all .2s',
-          }}>
+          <button
+            onClick={toggleTheme}
+            title={theme === 'dark' ? t('common.light') : t('common.dark')}
+            aria-label={theme === 'dark' ? t('common.light') : t('common.dark')}
+            style={{
+              width: 36, height: 36, border: `1px solid ${DS.bd}`,
+              borderRadius: 9, background: 'transparent',
+              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: theme === 'dark' ? DS.gold : DS.purple, transition: 'all .2s',
+            }}>
             {theme === 'dark' ? <IcoSun size={16} /> : <IcoMoon size={16} />}
           </button>
 
           <div style={{ position: 'relative' }}>
-            <button onClick={() => { setNotifOpen((v) => !v); markAllRead(); }} style={{
-              position: 'relative', width: 36, height: 36,
-              border: `1px solid ${notifOpen ? DS.blue + '55' : DS.bd}`,
-              borderRadius: 9,
-              background: notifOpen ? DS.blueDim : 'rgba(255,255,255,0.05)',
-              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: notifOpen ? DS.blueBright : DS.t2,
-            }}>
+            <button
+              onClick={() => { setNotifOpen((v) => !v); markAllRead(); }}
+              aria-label={unreadCount > 0 ? `Notificaciones (${unreadCount} sin leer)` : 'Notificaciones'}
+              aria-haspopup="dialog"
+              aria-expanded={notifOpen}
+              style={{
+                position: 'relative', width: 36, height: 36,
+                border: `1px solid ${notifOpen ? DS.blue + '55' : DS.bd}`,
+                borderRadius: 9,
+                background: notifOpen ? DS.blueDim : 'rgba(255,255,255,0.05)',
+                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: notifOpen ? DS.blueBright : DS.t2,
+              }}>
               <IcoBell size={16} />
               {unreadCount > 0 &&
-                <span className="pulse-dot" style={{
+                <span aria-hidden="true" className="pulse-dot" style={{
                   position: 'absolute', top: 7, right: 7,
                   width: 7, height: 7, borderRadius: '50%',
                   background: DS.gold, border: `2px solid ${DS.sidebar}`,
@@ -446,14 +513,16 @@ function AppShell() {
         </header>
 
         <main style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
-          <div key={activeView} className="rise-in">
-            {activeView === 'dashboard'   && <ViewDashboard />}
-            {activeView === 'leaderboard' && <ViewLeaderboard />}
-            {activeView === 'badges'      && <ViewBadges />}
-            {activeView === 'progress'    && <ViewProgress />}
-            {activeView === 'tasks'       && <ViewStudentTasks />}
-            {activeView === 'teacher'     && <ViewTeacher />}
-          </div>
+          <Suspense fallback={<ViewSkeleton />}>
+            <div key={activeView} className="rise-in">
+              {activeView === 'dashboard'   && <ViewDashboard />}
+              {activeView === 'leaderboard' && <ViewLeaderboard />}
+              {activeView === 'badges'      && <ViewBadges />}
+              {activeView === 'progress'    && <ViewProgress />}
+              {activeView === 'tasks'       && <ViewStudentTasks />}
+              {activeView === 'teacher'     && <ViewTeacher />}
+            </div>
+          </Suspense>
         </main>
 
         {isMobile &&
@@ -480,6 +549,9 @@ function AppShell() {
       <ProfileModal open={profileOpen} onClose={() => setProfileOpen(false)} />
       {langOpen && <div onClick={() => setLangOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 1500 }} />}
       <LanguageMenu open={langOpen} onClose={() => setLangOpen(false)} current={locale} onChange={setLocale} />
+      <Suspense fallback={null}>
+        {paletteOpen && <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />}
+      </Suspense>
     </div>
   );
 }

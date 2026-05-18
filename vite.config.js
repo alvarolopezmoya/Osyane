@@ -37,6 +37,7 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     include: ['tests/**/*.test.{js,jsx}'],
+    exclude: ['e2e/**', 'node_modules/**', 'dist/**'],
   },
   build: {
     outDir: 'dist',

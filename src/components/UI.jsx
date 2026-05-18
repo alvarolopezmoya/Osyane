@@ -1,6 +1,52 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useId } from 'react';
 import { DS } from './ds.js';
 import { IcoClose } from './Icons.jsx';
+
+// Focus-trap minimal sin dependencias externas.
+// Atrapa Tab/Shift+Tab dentro de un contenedor y cierra con Escape.
+function useFocusTrap(open, ref, onEscape) {
+  useEffect(() => {
+    if (!open || !ref.current) return undefined;
+    const root = ref.current;
+    const previouslyFocused = document.activeElement;
+
+    const FOCUSABLE = 'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const getFocusable = () => Array.from(root.querySelectorAll(FOCUSABLE)).filter((el) => !el.hasAttribute('aria-hidden'));
+
+    // Mover foco al primer elemento focusable del modal.
+    queueMicrotask(() => {
+      const items = getFocusable();
+      (items[0] || root).focus({ preventScroll: true });
+    });
+
+    function onKeyDown(e) {
+      if (e.key === 'Escape') { e.stopPropagation(); onEscape?.(); return; }
+      if (e.key !== 'Tab') return;
+      const items = getFocusable();
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault(); last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault(); first.focus();
+      }
+    }
+    document.addEventListener('keydown', onKeyDown);
+
+    // Bloquear scroll del body mientras el modal está abierto.
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = prevOverflow;
+      if (previouslyFocused && typeof previouslyFocused.focus === 'function') {
+        previouslyFocused.focus({ preventScroll: true });
+      }
+    };
+  }, [open, ref, onEscape]);
+}
 
 export function Avatar({ initials, size = 36, colorIndex = 0, glow = false }) {
   const pals = [
@@ -174,22 +220,43 @@ export function Input({ placeholder, value, onChange, icon, type = 'text', style
 }
 
 export function Modal({ open, onClose, title, children, width = 480 }) {
+  const dialogRef = useRef(null);
+  const titleId = useId();
+  useFocusTrap(open, dialogRef, onClose);
   if (!open) return null;
   return (
-    <div className="fade-in" onClick={onClose} style={{
-      position: 'fixed', inset: 0, zIndex: 1000,
-      background: 'rgba(0,0,0,0.78)', backdropFilter: 'blur(8px)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
-    }}>
-      <div onClick={e => e.stopPropagation()} className="rise-in" style={{
-        background: DS.card, borderRadius: 20, width, maxWidth: '100%',
-        border: `1px solid ${DS.bdMd}`,
-        boxShadow: '0 32px 80px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.05)',
-        overflow: 'hidden',
-      }}>
+    <div
+      className="fade-in"
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 1000,
+        background: 'rgba(0,0,0,0.78)', backdropFilter: 'blur(8px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
+      }}
+    >
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+        className="rise-in"
+        style={{
+          background: DS.card, borderRadius: 20, width, maxWidth: '100%',
+          border: `1px solid ${DS.bdMd}`,
+          boxShadow: '0 32px 80px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.05)',
+          overflow: 'hidden',
+          outline: 'none',
+        }}
+      >
         <div style={{ padding: '18px 24px 14px', borderBottom: `1px solid ${DS.bd}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span className="head" style={{ fontWeight: 700, fontSize: 15, color: DS.t1 }}>{title}</span>
-          <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.08)', border: 'none', borderRadius: 6, cursor: 'pointer', color: DS.t2, display: 'flex', padding: 6 }}>
+          <span id={titleId} className="head" style={{ fontWeight: 700, fontSize: 15, color: DS.t1 }}>{title}</span>
+          <button
+            onClick={onClose}
+            aria-label="Cerrar diálogo"
+            style={{ background: 'rgba(255,255,255,0.08)', border: 'none', borderRadius: 6, cursor: 'pointer', color: DS.t2, display: 'flex', padding: 6 }}
+          >
             <IcoClose size={14} />
           </button>
         </div>
@@ -217,17 +284,24 @@ export function Toast({ message, type = 'success', onClose }) {
   }[type] || {};
   useEffect(() => { const t = setTimeout(onClose, 3500); return () => clearTimeout(t); }, [onClose]);
   return (
-    <div style={{
-      position: 'fixed', bottom: 28, right: 28, zIndex: 2000,
-      background: DS.card, border: `1px solid ${cfg.bd}`,
-      borderRadius: 13, padding: '13px 18px',
-      boxShadow: '0 16px 40px rgba(0,0,0,0.55)',
-      display: 'flex', alignItems: 'center', gap: 12,
-      animation: 'riseIn .3s ease-out', maxWidth: 360,
-    }}>
-      <div style={{ width: 8, height: 8, borderRadius: '50%', background: cfg.color, flexShrink: 0, boxShadow: `0 0 10px ${cfg.color}` }} />
+    <div
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      style={{
+        position: 'fixed', bottom: 28, right: 28, zIndex: 2000,
+        background: DS.card, border: `1px solid ${cfg.bd}`,
+        borderRadius: 13, padding: '13px 18px',
+        boxShadow: '0 16px 40px rgba(0,0,0,0.55)',
+        display: 'flex', alignItems: 'center', gap: 12,
+        animation: 'riseIn .3s ease-out', maxWidth: 360,
+      }}
+    >
+      <div aria-hidden="true" style={{ width: 8, height: 8, borderRadius: '50%', background: cfg.color, flexShrink: 0, boxShadow: `0 0 10px ${cfg.color}` }} />
       <span style={{ color: DS.t1, fontWeight: 500, fontSize: 13, flex: 1 }}>{message}</span>
-      <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: DS.t2, display: 'flex' }}><IcoClose size={13} /></button>
+      <button onClick={onClose} aria-label="Cerrar notificación" style={{ background: 'none', border: 'none', cursor: 'pointer', color: DS.t2, display: 'flex' }}>
+        <IcoClose size={13} />
+      </button>
     </div>
   );
 }

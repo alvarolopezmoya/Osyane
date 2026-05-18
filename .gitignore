@@ -51,6 +51,11 @@ coverage/
 *.lcov
 .nyc_output/
 
+# ─── Playwright ────────────────────────────────────────
+playwright-report/
+test-results/
+.playwright/
+
 # ─── Específicos del proyecto ──────────────────────────
 uploads/
 scraps/

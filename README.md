@@ -433,20 +433,194 @@ npm test
 
 ---
 
-## 🔮 Roadmap (v2.0 — entregado vs. pendiente)
+## 🔮 Roadmap
 
 ### ✅ Entregado en v2.0
-- [x] **Persistencia con `localStorage`** para que el progreso se mantenga entre sesiones.
+
+- [x] **Persistencia con `localStorage`** entre sesiones (estudiantes, tareas, entregas, tema, idioma).
 - [x] **Vista de tareas para estudiantes** con entregas, contador hasta deadline y auto-otorgación de XP al aprobar.
 - [x] **Bundle con Vite** para producción: ~290 KB gzipped + PWA instalable + service worker.
-- [x] **Modo claro** opcional con toggle en topbar (persiste).
-- [x] **Tests** con Vitest: 39 tests cubriendo `getLevelInfo`, ranking, validaciones de tareas y deadlines.
-- [x] **i18n**: soporte multilenguaje (es / en) con autodetección y selector en topbar.
+- [x] **Modo claro / oscuro** con toggle persistente.
+- [x] **Tests** con Vitest: 39 tests cubriendo niveles, ranking, validaciones de tareas y cálculo de deadlines (timezone-safe).
+- [x] **i18n** español / inglés con autodetección y selector en topbar.
 
-### 🚧 Pendiente (con stubs documentados)
-- [ ] **Backend ligero** (Firebase, Supabase o Express + SQLite) para multi-usuario real — ver `TODO[BACKEND]` en `src/services/api.js`.
-- [ ] **Auth con UTA SSO** (OAuth contra `@uta.edu.ec` vía Azure AD / MSAL) — ver `TODO[SSO]` en `src/services/auth.js`.
-- [ ] **Notificaciones reales** vía WebSocket o Server-Sent Events — ver `TODO[REALTIME]` en `src/services/notifications.js`.
+### 🚧 Pendiente
+
+A continuación, el plan completo de mejoras agrupado por capa. Las marcadas como **TODO** en el código (`src/services/*.js`) tienen el bloque exacto de implementación documentado.
+
+<details>
+<summary><strong>1 · Cimientos técnicos</strong> (hazlos antes que features)</summary>
+
+- [ ] Migrar a **TypeScript**: tipar `Student`, `Task`, `Submission`, `Notification`.
+- [ ] Validación con **Zod** compartida entre cliente y backend.
+- [ ] **ESLint + Prettier + Husky + lint-staged**; pre-commit que corra `test && lint`.
+- [ ] **Error Boundary global** con UI de fallback amigable + reporte a Sentry.
+- [ ] **Storybook 8** como catálogo navegable de componentes (`Avatar`, `Btn`, `Modal`, `StatCard`).
+- [ ] Reemplazar Context API por **Zustand** o **Jotai** para re-renders selectivos.
+</details>
+
+<details>
+<summary><strong>2 · Backend real</strong> (TODO[BACKEND])</summary>
+
+- [ ] **Supabase** (Postgres + Auth + Realtime + Storage) — recomendación firme.
+- [ ] **Row-Level Security (RLS)** en Postgres: cada estudiante solo lee sus entregas.
+- [ ] **TanStack Query** para estado del servidor con cache, refetch en focus y optimistic updates.
+- [ ] **Migraciones versionadas** (`supabase/migrations/`) corridas en CI.
+- [ ] **Edge functions / cron jobs**: cálculo real de rachas, resumen semanal por email, expirar tareas vencidas.
+</details>
+
+<details>
+<summary><strong>3 · Auth y seguridad</strong> (TODO[SSO])</summary>
+
+- [ ] **Magic link** al correo `@uta.edu.ec` vía Supabase Auth (ver `services/auth.js`).
+- [ ] Roles granulares: `student`, `teacher`, `admin`, `coordinator`, `student-rep`.
+- [ ] **Audit log** inmutable de cada `awardXp`, `approveSubmission`, etc.
+- [ ] **Rate limiting** por docente: máx. X XP por estudiante por día.
+- [ ] **CSP headers + HTTPS Strict Transport** en el host.
+</details>
+
+<details>
+<summary><strong>4 · Gamificación con profundidad</strong></summary>
+
+- [ ] **Quests / desafíos semanales** ("Entrega 3 tareas → +500 XP bonus").
+- [ ] **Temporadas de ranking** con reset trimestral e histórico.
+- [ ] **Rachas reales** basadas en actividad detectada, no en `Math.random()`.
+- [ ] **Equipos** con rankings grupales y entregas que reparten XP.
+- [ ] **Curva de XP configurable** por docente (multiplicador por dificultad, bono por entrega temprana).
+- [ ] **Anti-inflación** de XP: diminishing returns sobre el día.
+- [ ] **Marketplace de recompensas**: canjear XP por privilegios (extender deadline, pista en examen, etc.).
+</details>
+
+<details>
+<summary><strong>5 · Herramientas pro para docentes</strong></summary>
+
+- [ ] **Plantillas de tareas** reutilizables y clonables entre semestres.
+- [ ] **Rúbricas** con criterios ponderados; aprobar puntúa por criterio.
+- [ ] **Feedback escrito** en entregas con soporte Markdown.
+- [ ] **Operaciones en bulk**: otorgar XP a N estudiantes seleccionados.
+- [ ] **Analytics dashboard**: distribución de XP, tasa de entrega, estudiantes en riesgo.
+- [ ] **Reporte automático** semanal en PDF enviado por email.
+- [ ] **Importar lista de estudiantes** desde CSV / Excel para onboarding masivo.
+</details>
+
+<details>
+<summary><strong>6 · Features para estudiantes</strong></summary>
+
+- [ ] **Búsqueda global (Cmd+K)** estilo Linear/Notion.
+- [ ] **Calendario** con vista mensual de tareas y exportación a `.ics`.
+- [ ] **Goal setting** personal con barra de progreso a una meta.
+- [ ] **Portafolio público** en URL `osyane.app/u/<usuario>`.
+- [ ] **Preferencias de notificaciones** por tipo + digest semanal por email.
+- [ ] **Comparativa con la cohorte**: "Estás 23 % sobre la media en Programación OO".
+- [ ] **Recordatorios inteligentes**: push 24 h antes de un deadline pendiente.
+</details>
+
+<details>
+<summary><strong>7 · UX / Diseño</strong></summary>
+
+- [ ] **Skeleton loaders** en lugar de spinners.
+- [ ] **Confetti animado** al subir de nivel u obtener insignia rara (`canvas-confetti`).
+- [ ] **Cola de toasts** en lugar de reemplazo.
+- [ ] **Empty states** con CTA específica.
+- [ ] **Drag & drop**: reordenar tareas; kanban del docente para entregas.
+- [ ] **Atajos de teclado** (`g d`, `g r`, `?`).
+- [ ] **Onboarding interactivo** de 60 s para el primer login.
+</details>
+
+<details>
+<summary><strong>8 · Accesibilidad (a11y)</strong></summary>
+
+- [ ] `aria-label` en todos los botones-sólo-ícono.
+- [ ] **Focus trap + Escape** en modales; focus vuelve al disparador.
+- [ ] **Contraste WCAG AA** auditado con axe DevTools.
+- [ ] Respetar `prefers-reduced-motion`.
+- [ ] Navegación por teclado completa con focus visible siempre.
+- [ ] `aria-live="polite"` para anunciar XP/insignias a screen readers.
+</details>
+
+<details>
+<summary><strong>9 · Internacionalización seria</strong></summary>
+
+- [ ] Tipar claves de traducción con TS.
+- [ ] **Pluralización con ICU MessageFormat** (`{count, plural, one {# tarea} other {# tareas}}`).
+- [ ] Formato de fechas/números con `Intl.RelativeTimeFormat`.
+- [ ] Soporte **RTL** para futuras lenguas.
+</details>
+
+<details>
+<summary><strong>10 · Performance</strong></summary>
+
+- [ ] **`React.lazy` + Suspense** para Recharts (565 KB → fuera del bundle inicial, ~60 % menos).
+- [ ] **Virtualización** con `@tanstack/react-virtual` cuando el ranking supere 200 filas.
+- [ ] Imágenes en **WebP/AVIF** y múltiples tamaños de ícono PWA.
+- [ ] **Compresión Brotli** en el host (Vercel/Cloudflare la traen automática).
+- [ ] **Preload de fuentes** críticas para evitar FOUT.
+- [ ] **Bundle analyzer** (`rollup-plugin-visualizer`); considerar reemplazar `xlsx` (283 KB) por `exceljs` o carga dinámica.
+</details>
+
+<details>
+<summary><strong>11 · Observabilidad</strong></summary>
+
+- [ ] **Sentry** para errores en producción con stack traces y session replay.
+- [ ] **PostHog** (open source) para analytics + feature flags + A/B testing.
+- [ ] **Web Vitals tracking** (LCP, CLS, INP) reportado a Sentry.
+- [ ] **Status page** pública en `osyane.app/status`.
+</details>
+
+<details>
+<summary><strong>12 · Quality / DX</strong></summary>
+
+- [ ] **Tests E2E** con Playwright del flujo entrega → aprobación → XP.
+- [ ] **Tests visuales** con Chromatic o Percy.
+- [ ] **CI matrix**: Node 20 + 22, Chromium + Firefox + WebKit.
+- [ ] **PR previews** automáticos en Vercel/Netlify.
+- [ ] **Conventional Commits** + changelog automático (`release-please`).
+- [ ] **Renovate / Dependabot** para actualizar dependencias.
+</details>
+
+<details>
+<summary><strong>13 · PWA / Mobile</strong></summary>
+
+- [ ] **Push notifications** reales con Web Push API.
+- [ ] **Background Sync** para entregas hechas offline.
+- [ ] **Install prompt UI** sutil tras N visitas.
+- [ ] App nativa con **Capacitor** (iOS / Android sin reescribir).
+</details>
+
+<details>
+<summary><strong>14 · Compliance y legal</strong></summary>
+
+- [ ] Política de privacidad + términos de uso.
+- [ ] Banner de consentimiento de cookies/analytics.
+- [ ] **GDPR / LOPDP Ecuador**: exportar / borrar mis datos.
+- [ ] Página de declaración de accesibilidad.
+- [ ] Política de backup y retención.
+</details>
+
+<details>
+<summary><strong>15 · Crecimiento y comunidad</strong></summary>
+
+- [ ] **Landing page pública** explicativa (separada del login).
+- [ ] **Códigos de invitación a cursos** (`FISEI-2026A-3F2X`).
+- [ ] **Roadmap público votable** (Canny / Linear).
+- [ ] **In-app changelog** modal de novedades.
+- [ ] **Documentation site** con Docusaurus o VitePress.
+</details>
+
+### 🎯 Top 10 prioridades (por ROI)
+
+| # | Mejora | Impacto | Esfuerzo |
+|:-:|---|---|---|
+| 1 | **Lazy load de Recharts** | -60 % bundle inicial | 1 h |
+| 2 | **Magic link + Supabase Auth** | Auth real con `@uta.edu.ec` sin permisos institucionales | 1 tarde |
+| 3 | **Migración a TypeScript** | Atrapa el 80 % de bugs antes de runtime | 1-2 días |
+| 4 | **Confetti + skeleton loaders** | UX percibida +50 % sin esfuerzo | 2 h |
+| 5 | **Sentry** | Visibilidad de errores en producción | 30 min |
+| 6 | **Atajos de teclado + Cmd+K** | Sensación de producto pro | medio día |
+| 7 | **A11y básico** (focus trap, contraste, reduced-motion) | Inclusión + obligación legal | medio día |
+| 8 | **Supabase + TanStack Query** | Mata todos los TODOs de backend | 2 días |
+| 9 | **E2E Playwright** del flujo crítico | Protege regresiones | medio día |
+| 10 | **Audit log inmutable** | Obligatorio en sistema académico | medio día |
 
 ---
 
