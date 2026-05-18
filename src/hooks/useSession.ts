@@ -1,12 +1,21 @@
-// Hook que mantiene sincronizada la sesión de Supabase con el estado de React.
-// Devuelve { user, session, loading }. En modo demo devuelve { user: null, session: null, loading: false }.
 import { useEffect, useState } from 'react';
+import type { Session, User } from '@supabase/supabase-js';
 import { isSupabaseEnabled } from '../services/supabase.js';
 import { getSession, onAuthChange } from '../services/auth-supabase.js';
 import { setUser as sentrySetUser } from '../services/sentry.js';
 
-export function useSession() {
-  const [state, setState] = useState({ user: null, session: null, loading: isSupabaseEnabled });
+interface SessionState {
+  user: User | null;
+  session: Session | null;
+  loading: boolean;
+}
+
+export function useSession(): SessionState {
+  const [state, setState] = useState<SessionState>({
+    user: null,
+    session: null,
+    loading: isSupabaseEnabled,
+  });
 
   useEffect(() => {
     if (!isSupabaseEnabled) return undefined;
@@ -14,14 +23,14 @@ export function useSession() {
 
     getSession().then((session) => {
       if (!mounted) return;
-      const user = session?.user || null;
+      const user = session?.user ?? null;
       sentrySetUser(user ? { id: user.id, email: user.email } : null);
       setState({ user, session, loading: false });
     });
 
     const unsub = onAuthChange(({ session, user }) => {
       if (!mounted) return;
-      sentrySetUser(user ? { id: user.id, email: user.email } : null);
+      sentrySetUser(user ? { id: user.id, email: user.email ?? undefined } : null);
       setState({ user, session, loading: false });
     });
 

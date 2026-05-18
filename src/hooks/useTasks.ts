@@ -1,6 +1,5 @@
-// Hook de TanStack Query para tareas + entregas.
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { isSupabaseEnabled } from '../services/supabase.js';
 import {
   fetchTasks, createTask, deleteTask,
@@ -8,8 +7,8 @@ import {
   subscribeToTable,
 } from '../services/api-supabase.js';
 
-export const TASKS_KEY = ['tasks'];
-export const SUBMISSIONS_KEY = ['submissions'];
+export const TASKS_KEY = ['tasks'] as const;
+export const SUBMISSIONS_KEY = ['submissions'] as const;
 
 export function useTasks() {
   const qc = useQueryClient();
@@ -67,8 +66,6 @@ export function useReviewSubmission() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: reviewSubmission,
-    // Aprobar dispara el trigger SQL que actualiza XP del estudiante.
-    // Invalidamos también profiles para refrescar el ranking.
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: SUBMISSIONS_KEY });
       qc.invalidateQueries({ queryKey: ['profiles'] });

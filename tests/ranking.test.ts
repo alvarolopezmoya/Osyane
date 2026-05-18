@@ -41,7 +41,7 @@ describe('buildLeaderboard', () => {
 
 describe('findRank', () => {
   it('encuentra rank de "isMe"', () => {
-    expect(findRank(SAMPLE, (s) => s.isMe)).toBe(1);
+    expect(findRank(SAMPLE, (s) => s.isMe === true)).toBe(1);
   });
 
   it('encuentra rank por id', () => {

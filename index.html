@@ -2,17 +2,67 @@
 <html lang="es">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Osyane · Gamificación Académica</title>
-<meta name="description" content="Sistema de Gamificación y Ranking Académico — FISEI · Universidad Técnica de Ambato" />
-<meta name="theme-color" content="#060912" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark light" />
+
+<title>Osyane · Gamificación Académica FISEI · UTA</title>
+<meta name="description" content="Sistema de Gamificación y Ranking Académico para la Facultad de Ingeniería en Sistemas, Electrónica e Industrial de la Universidad Técnica de Ambato. Niveles, XP, insignias y rankings que motivan el aprendizaje." />
+<meta name="keywords" content="gamificación, educación, UTA, FISEI, ingeniería de software, Ecuador, ranking académico, XP, insignias" />
+<meta name="author" content="Osyan Granda" />
+<meta name="theme-color" content="#060912" media="(prefers-color-scheme: dark)" />
+<meta name="theme-color" content="#f4f6fb" media="(prefers-color-scheme: light)" />
+
+<!-- Canonical + favicon -->
+<link rel="canonical" href="https://alvarolopezmoya.github.io/Osyane/" />
 <link rel="icon" type="image/jpeg" href="./assets/uta-logo.jpg" />
+<link rel="apple-touch-icon" href="./assets/uta-logo.jpg" />
+
+<!-- Open Graph (Facebook, LinkedIn, WhatsApp, Discord) -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Osyane" />
+<meta property="og:title" content="Osyane · Gamificación Académica" />
+<meta property="og:description" content="Convierte tu rendimiento académico en una experiencia tipo videojuego. Niveles, XP, insignias y rankings para estudiantes de FISEI · UTA." />
+<meta property="og:image" content="https://alvarolopezmoya.github.io/Osyane/assets/uta-logo.jpg" />
+<meta property="og:image:alt" content="Logo de Osyane sobre fondo azul oscuro" />
+<meta property="og:url" content="https://alvarolopezmoya.github.io/Osyane/" />
+<meta property="og:locale" content="es_EC" />
+<meta property="og:locale:alternate" content="en_US" />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Osyane · Gamificación Académica" />
+<meta name="twitter:description" content="Niveles, XP, insignias y rankings para estudiantes de FISEI · UTA." />
+<meta name="twitter:image" content="https://alvarolopezmoya.github.io/Osyane/assets/uta-logo.jpg" />
+
+<!-- Schema.org JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Osyane",
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "Any",
+  "description": "Sistema de Gamificación Académica para FISEI · UTA.",
+  "author": { "@type": "Person", "name": "Osyan Granda" },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
+
+<!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <div id="root"></div>
-  <script type="module" src="/src/main.jsx"></script>
+  <div id="root">
+    <!-- Fallback mientras carga el bundle JS — visible si JS está deshabilitado o falla. -->
+    <noscript>
+      <div style="padding:24px;font-family:sans-serif;color:#e8edf8;background:#060912;text-align:center;min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;">
+        <h1 style="color:#4f8ef7;margin:0 0 8px;">Osyane</h1>
+        <p style="color:#5a6a8a;margin:0;">Esta aplicación requiere JavaScript habilitado.</p>
+      </div>
+    </noscript>
+  </div>
+  <script type="module" src="/src/main.tsx"></script>
 </body>
 </html>

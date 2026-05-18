@@ -71,11 +71,13 @@ export function isOverdue(deadline: string | null | undefined, now: Date = new D
 }
 
 // ── Submissions ───────────────────────────────────────────────────────────
-export function submissionFor(
+// Genéricos: aceptan cualquier objeto con los campos mínimos requeridos. Útil
+// para tests con fixtures parciales y para combinar con tipos derivados de Supabase.
+export function submissionFor<S extends Pick<Submission, 'taskId' | 'studentId'>>(
   task: Pick<Task, 'id'>,
-  submissions: Submission[],
+  submissions: S[],
   studentId: string
-): Submission | null {
+): S | null {
   return submissions.find((s) => s.taskId === task.id && s.studentId === studentId) ?? null;
 }
 

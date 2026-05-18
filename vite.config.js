@@ -1,10 +1,12 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import { visualizer } from 'rollup-plugin-visualizer';
+
+const ANALYZE = process.env.ANALYZE === 'true';
 
 export default defineConfig({
   // For GitHub Pages project sites (https://user.github.io/Osyane/) use base: '/Osyane/'.
-  // Set with: VITE_BASE=/Osyane/ npm run build  (or hard-code below).
   base: process.env.VITE_BASE || './',
   plugins: [
     react(),
@@ -32,11 +34,20 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,jpg,ico,woff2}'],
       },
     }),
+    // Bundle analyzer — habilitado con: ANALYZE=true npm run build
+    // (o `npm run build:analyze`). Genera dist/stats.html con un treemap interactivo.
+    ANALYZE && visualizer({
+      filename: 'dist/stats.html',
+      open: true,
+      gzipSize: true,
+      brotliSize: true,
+      template: 'treemap',
+    }),
   ],
   test: {
     environment: 'jsdom',
     globals: true,
-    include: ['tests/**/*.test.{js,jsx}'],
+    include: ['tests/**/*.test.{js,jsx,ts,tsx}'],
     exclude: ['e2e/**', 'node_modules/**', 'dist/**'],
   },
   build: {

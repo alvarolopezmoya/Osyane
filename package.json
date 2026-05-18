@@ -18,8 +18,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:analyze": "ANALYZE=true vite build",
+    "build:analyze": "cross-env ANALYZE=true vite build",
     "preview": "vite preview",
+    "size": "npm run build && node scripts/size.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -48,6 +49,7 @@
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
+    "cross-env": "^7.0.3",
     "gh-pages": "^6.2.0",
     "jsdom": "^25.0.1",
     "rollup-plugin-visualizer": "^5.13.1",

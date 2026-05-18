@@ -1,19 +1,16 @@
-// Hook de TanStack Query para la lista de perfiles (estudiantes + docentes).
-// Solo activo cuando Supabase está configurado.
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { isSupabaseEnabled, supabase } from '../services/supabase.js';
+import { useEffect } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { isSupabaseEnabled } from '../services/supabase.js';
 import {
   fetchProfiles, awardXp as apiAwardXp, awardBadge as apiAwardBadge,
   subscribeToTable,
 } from '../services/api-supabase.js';
-import { useEffect } from 'react';
 
-export const PROFILES_KEY = ['profiles'];
+export const PROFILES_KEY = ['profiles'] as const;
 
 export function useStudents() {
   const qc = useQueryClient();
 
-  // Realtime: invalidar cache cuando otro usuario actualice perfiles.
   useEffect(() => {
     if (!isSupabaseEnabled) return undefined;
     return subscribeToTable('profiles', () => {
