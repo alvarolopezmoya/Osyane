@@ -3,6 +3,7 @@ import { useApp } from './store.jsx';
 import { useI18n, LOCALES } from './i18n/index.jsx';
 import { BADGES } from './data.js';
 import { DS } from './components/ds.js';
+import { isSupabaseEnabled } from './services/supabase.js';
 import { Avatar, XPBar, Toast } from './components/UI.jsx';
 import { ViewSkeleton } from './components/Skeleton.jsx';
 import {
@@ -406,6 +407,30 @@ function AppShell() {
                 fontFamily: "'JetBrains Mono', monospace",
               }}>⌘K</kbd>
             </button>
+          )}
+
+          {!isMobile && !isSupabaseEnabled && (
+            <span
+              title="La app está corriendo con datos locales (sin backend). Configura Supabase para multi-usuario real."
+              style={{
+                fontSize: 10, fontWeight: 800, letterSpacing: '.08em',
+                background: 'rgba(245,166,35,0.12)', color: DS.gold,
+                border: '1px solid rgba(245,166,35,0.32)',
+                borderRadius: 6, padding: '3px 8px',
+              }}
+            >🧪 DEMO</span>
+          )}
+
+          {!isMobile && isSupabaseEnabled && (
+            <span
+              title="Conectado a backend Supabase"
+              style={{
+                fontSize: 10, fontWeight: 800, letterSpacing: '.08em',
+                background: 'rgba(15,217,160,0.12)', color: DS.green,
+                border: '1px solid rgba(15,217,160,0.32)',
+                borderRadius: 6, padding: '3px 8px',
+              }}
+            >● LIVE</span>
           )}
 
           {!isMobile &&

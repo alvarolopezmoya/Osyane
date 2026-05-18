@@ -85,18 +85,25 @@ Osyane convierte el rendimiento académico de los estudiantes en una experiencia
 
 ## 🛠 Stack técnico
 
-| Capa            | Tecnología                                              |
-| --------------- | ------------------------------------------------------- |
-| UI Framework    | **React 18.3.1** (ESM)                                  |
-| Bundler         | **Vite 6** + `@vitejs/plugin-react`                     |
-| PWA             | **vite-plugin-pwa** (service worker + precache offline) |
-| Estilos         | **CSS** (sin framework) con design tokens y data-theme  |
-| Gráficos        | **Recharts 2.12**                                       |
-| Exportación     | **SheetJS (xlsx)**                                      |
-| Tests           | **Vitest 2** + `jsdom`                                  |
-| i18n            | Custom context (es / en, autodetect navegador)          |
-| Persistencia    | `localStorage` (estudiantes, tareas, entregas, tema, idioma, sesión) |
-| Tipografías     | Inter, Plus Jakarta Sans, JetBrains Mono (Google Fonts) |
+| Capa             | Tecnología                                                       |
+| ---------------- | ---------------------------------------------------------------- |
+| UI Framework     | **React 18.3.1** (ESM, lazy routes)                              |
+| Bundler          | **Vite 6** + `@vitejs/plugin-react` + code-splitting             |
+| Backend (opt)    | **Supabase** (Postgres + Auth + Realtime) — opt-in vía env vars  |
+| Server state     | **TanStack Query 5** con realtime invalidation                   |
+| Auth (opt)       | **Magic link** restringido a `@uta.edu.ec`                       |
+| PWA              | **vite-plugin-pwa** (service worker + precache offline)          |
+| Estilos          | **CSS** (sin framework) con design tokens y data-theme           |
+| Gráficos         | **Recharts 2.12** (lazy-loaded)                                  |
+| Exportación      | **SheetJS (xlsx)** (lazy-loaded)                                 |
+| Command palette  | **cmdk** con ⌘K hotkey                                           |
+| Animaciones      | **canvas-confetti** + CSS keyframes (respeta reduced-motion)      |
+| Error tracking   | **Sentry** opt-in (sin DSN: console.error)                       |
+| Unit tests       | **Vitest 2** + `jsdom` (39 tests)                                |
+| E2E tests        | **Playwright 1.49** contra preview server (7 tests)              |
+| i18n             | Custom context (es / en, autodetect)                             |
+| Persistencia     | `localStorage` (demo) ó Supabase Postgres (live)                 |
+| Tipografías      | Inter, Plus Jakarta Sans, JetBrains Mono (Google Fonts)          |
 
 ---
 
@@ -106,45 +113,65 @@ Osyane convierte el rendimiento académico de los estudiantes en una experiencia
 Osyane_v2/
 ├── index.html                ← Entry HTML (Vite)
 ├── vite.config.js            ← Build, PWA, code-splitting, Vitest config
-├── package.json              ← Scripts: dev / build / preview / test / deploy
+├── playwright.config.js      ← E2E config (preview server, locale es-EC)
+├── package.json              ← Scripts: dev / build / preview / test / e2e / deploy
+├── .env.example              ← Template para configurar Supabase + Sentry
 ├── public/
 │   └── assets/uta-logo.jpg
+├── supabase/
+│   ├── schema.sql            ← DDL completo: tablas, RLS, triggers, RPCs
+│   ├── seed.sql              ← Datos de prueba para dev
+│   └── README.md             ← Guía paso a paso para conectar Supabase
 ├── src/
-│   ├── main.jsx              ← Entry point (StrictMode + Providers)
-│   ├── App.jsx               ← Shell: login, sidebar, topbar, router de vistas
+│   ├── main.jsx              ← Entry: StrictMode + ErrorBoundary + Providers
+│   ├── App.jsx               ← Shell: sidebar, topbar, ⌘K, lazy routes
 │   ├── store.jsx             ← Estado global con localStorage persistence
-│   ├── data.js               ← Datos semilla (mock)
-│   ├── styles.css            ← CSS global + tokens + tema claro/oscuro
+│   ├── data.js               ← Datos semilla (usados en modo demo)
+│   ├── styles.css            ← CSS global + tokens + reduced-motion
 │   ├── components/
 │   │   ├── ds.js             ← Design tokens y switch de tema
-│   │   ├── UI.jsx            ← Avatar, XPBar, StatCard, Modal, Toast, Btn…
+│   │   ├── UI.jsx            ← Avatar, XPBar, StatCard, Modal (focus trap), Toast (aria-live)
 │   │   ├── Icons.jsx         ← Librería de iconos SVG inline
-│   │   └── Charts.jsx        ← Recharts wrappers
+│   │   ├── Charts.jsx        ← Wrappers de Recharts
+│   │   ├── Skeleton.jsx      ← Skeleton loaders (Skeleton, SkeletonCard, ViewSkeleton)
+│   │   ├── ErrorBoundary.jsx ← Captura errores → Sentry + UI de fallback
+│   │   └── CommandPalette.jsx ← ⌘K palette con cmdk
 │   ├── utils/
-│   │   ├── levels.js         ← getLevelInfo (pura, testeada)
+│   │   ├── levels.js         ← getLevelInfo (testeado)
 │   │   ├── ranking.js        ← buildLeaderboard, findRank
-│   │   ├── tasks.js          ← validateTask, daysUntilDeadline, isOverdue…
-│   │   └── storage.js        ← localStorage helpers + usePersistedState
+│   │   ├── tasks.js          ← validateTask, daysUntilDeadline (timezone-safe)
+│   │   ├── storage.js        ← usePersistedState, load/save
+│   │   └── confetti.js       ← burstGold / burstBlue / burstRare (respeta reduced-motion)
 │   ├── i18n/
-│   │   ├── index.jsx         ← Provider con detección automática
-│   │   ├── es.js             ← Español
-│   │   └── en.js             ← Inglés
+│   │   ├── index.jsx         ← Provider con autodetección
+│   │   ├── es.js / en.js     ← Diccionarios
 │   ├── services/
-│   │   ├── api.js            ← Stub local + TODO[BACKEND] para Firebase/Supabase
-│   │   ├── auth.js           ← Login local + TODO[SSO] para MSAL/Azure AD UTA
-│   │   └── notifications.js  ← EventEmitter + TODO[REALTIME] para WS/SSE
+│   │   ├── supabase.js       ← Cliente Supabase (null si no hay env vars)
+│   │   ├── auth.js           ← Login local (modo demo)
+│   │   ├── auth-supabase.js  ← Magic link + sesión
+│   │   ├── api.js            ← API local (modo demo)
+│   │   ├── api-supabase.js   ← CRUD contra Postgres + realtime
+│   │   ├── query.jsx         ← QueryClientProvider de TanStack
+│   │   ├── notifications.js  ← EventEmitter local + TODO[REALTIME]
+│   │   └── sentry.js         ← initSentry, captureException (no-op sin DSN)
+│   ├── hooks/
+│   │   ├── useSession.js     ← Sesión Supabase reactiva
+│   │   ├── useStudents.js    ← Query + mutaciones (XP, badges)
+│   │   └── useTasks.js       ← Query + mutaciones (tareas, entregas, review)
 │   └── views/
-│       ├── Login.jsx
+│       ├── Login.jsx         ← Tabs: Magic link / Demo
 │       ├── Dashboard.jsx
 │       ├── Leaderboard.jsx
 │       ├── Badges.jsx
 │       ├── Progress.jsx
-│       ├── StudentTasks.jsx  ← NUEVO: tareas del estudiante con entregas y auto-XP
-│       └── Teacher.jsx       ← Tabs: Estudiantes / Tareas / Entregas
-└── tests/
-    ├── levels.test.js        ← 11 tests
-    ├── ranking.test.js       ← 8 tests
-    └── tasks.test.js         ← 20 tests
+│       ├── StudentTasks.jsx  ← Tareas del estudiante con auto-XP
+│       └── Teacher.jsx       ← Estudiantes / Tareas / Entregas
+├── tests/                    ← Vitest unit tests (39)
+│   ├── levels.test.js
+│   ├── ranking.test.js
+│   └── tasks.test.js
+└── e2e/                      ← Playwright E2E (7)
+    └── smoke.spec.js         ← Login + entrega → aprobación + atajos + a11y
 ```
 
 ---
@@ -178,9 +205,34 @@ npm run preview      # sirve dist/ localmente para probar el build
 ### Tests
 
 ```bash
-npm test             # corre los 39 tests con Vitest
+npm test             # 39 unit tests con Vitest
 npm run test:watch   # modo watch para TDD
+npm run e2e          # 7 tests E2E con Playwright (preview server)
+npm run e2e:ui       # E2E con UI interactiva
 ```
+
+### Modo demo vs. backend real
+
+La app tiene dos modos de operación:
+
+| | 🧪 Modo demo (default) | ● Modo live |
+|---|---|---|
+| **Backend** | Ninguno — datos en `localStorage` | Supabase (Postgres + Auth + Realtime) |
+| **Auth** | Email + contraseña mock (`osyane`) | Magic link a `@uta.edu.ec` |
+| **Multi-usuario** | No — cada navegador es un sandbox | Sí — todos comparten BD |
+| **Persiste entre dispositivos** | No | Sí |
+| **Setup** | Cero config | Crear proyecto Supabase + correr `schema.sql` |
+
+Para activar el modo live, sigue la guía en [`supabase/README.md`](./supabase/README.md). Resumen:
+
+```bash
+cp .env.example .env
+# Editar .env con tu URL y anon key de Supabase
+# Pegar supabase/schema.sql en el SQL Editor del dashboard
+npm run dev
+```
+
+Cuando las env vars están definidas, el badge en el topbar cambia de `🧪 DEMO` a `● LIVE`.
 
 ### Deploy a GitHub Pages
 
@@ -435,14 +487,33 @@ npm test
 
 ## 🔮 Roadmap
 
-### ✅ Entregado en v2.0
+### ✅ Entregado
 
-- [x] **Persistencia con `localStorage`** entre sesiones (estudiantes, tareas, entregas, tema, idioma).
-- [x] **Vista de tareas para estudiantes** con entregas, contador hasta deadline y auto-otorgación de XP al aprobar.
-- [x] **Bundle con Vite** para producción: ~290 KB gzipped + PWA instalable + service worker.
-- [x] **Modo claro / oscuro** con toggle persistente.
-- [x] **Tests** con Vitest: 39 tests cubriendo niveles, ranking, validaciones de tareas y cálculo de deadlines (timezone-safe).
-- [x] **i18n** español / inglés con autodetección y selector en topbar.
+**v2.0** — Migración + features core
+- [x] **Persistencia con `localStorage`** entre sesiones.
+- [x] **Vista de tareas para estudiantes** con entregas, contador hasta deadline y auto-XP al aprobar.
+- [x] **Bundle con Vite** para producción: ~25 KB gzip First Load (con lazy loading).
+- [x] **Modo claro / oscuro** persistente.
+- [x] **Tests Vitest** (39) + **Tests E2E Playwright** (7) cubriendo el flujo crítico.
+- [x] **i18n** español / inglés con autodetección.
+
+**v2.1** — Polish profesional
+- [x] **Lazy load** de vistas con `React.lazy` + Suspense — Recharts (565 KB) y xlsx (283 KB) fuera del bundle inicial.
+- [x] **Error Boundary global** + UI de fallback con reset de datos locales.
+- [x] **Sentry opt-in** (sin DSN: no-op).
+- [x] **Skeleton loaders** durante lazy-load.
+- [x] **A11y**: focus trap + Escape en modales, `aria-live` en toasts, `prefers-reduced-motion`, `aria-label` en botones-solo-ícono.
+- [x] **Confetti** dorado/azul/rainbow en logros (respeta reduced-motion).
+- [x] **Command Palette** `⌘K` / `Ctrl+K` con cmdk.
+- [x] CI workflow corre unit + E2E + build + deploy con secrets opcionales.
+
+**v2.2** — Backend listo para enchufar
+- [x] **Supabase** integrado opcionalmente — sin env vars la app sigue en modo demo, con env vars conecta al backend real.
+- [x] **Magic link** auth (sin contraseñas) restringido a `@uta.edu.ec`.
+- [x] **TanStack Query** con cache, refetch y realtime invalidation.
+- [x] **Schema SQL completo** con RLS policies, triggers (auto-XP al aprobar entrega), audit log inmutable y RPCs.
+- [x] Badges visuales `🧪 DEMO` / `● LIVE` en topbar según el modo.
+- [x] Guía paso a paso en [`supabase/README.md`](./supabase/README.md).
 
 ### 🚧 Pendiente
 
@@ -460,21 +531,24 @@ A continuación, el plan completo de mejoras agrupado por capa. Las marcadas com
 </details>
 
 <details>
-<summary><strong>2 · Backend real</strong> (TODO[BACKEND])</summary>
+<summary><strong>2 · Backend real</strong> ✅ infraestructura lista — falta migrar el store</summary>
 
-- [ ] **Supabase** (Postgres + Auth + Realtime + Storage) — recomendación firme.
-- [ ] **Row-Level Security (RLS)** en Postgres: cada estudiante solo lee sus entregas.
-- [ ] **TanStack Query** para estado del servidor con cache, refetch en focus y optimistic updates.
-- [ ] **Migraciones versionadas** (`supabase/migrations/`) corridas en CI.
-- [ ] **Edge functions / cron jobs**: cálculo real de rachas, resumen semanal por email, expirar tareas vencidas.
+- [x] **Supabase** integrado (Postgres + Auth + Realtime).
+- [x] **Row-Level Security** completa en `supabase/schema.sql`.
+- [x] **TanStack Query** configurado con realtime invalidation.
+- [x] **Triggers SQL** para auto-XP al aprobar entrega + audit_log.
+- [ ] **Migrar el `store.jsx` completo** a leer/escribir vía hooks `useStudents/useTasks/useSubmissions` cuando `isSupabaseEnabled`. Hoy los hooks existen pero el store sigue usando localStorage incluso con Supabase activo.
+- [ ] Migraciones versionadas (`supabase/migrations/0002_xxx.sql`).
+- [ ] **Edge functions / cron jobs**: cálculo de rachas reales, resumen semanal por email, expirar tareas vencidas.
 </details>
 
 <details>
-<summary><strong>3 · Auth y seguridad</strong> (TODO[SSO])</summary>
+<summary><strong>3 · Auth y seguridad</strong> ✅ magic link listo</summary>
 
-- [ ] **Magic link** al correo `@uta.edu.ec` vía Supabase Auth (ver `services/auth.js`).
-- [ ] Roles granulares: `student`, `teacher`, `admin`, `coordinator`, `student-rep`.
-- [ ] **Audit log** inmutable de cada `awardXp`, `approveSubmission`, etc.
+- [x] **Magic link** al correo `@uta.edu.ec` con Supabase Auth.
+- [x] **Audit log** inmutable con triggers SQL.
+- [x] **Sentry** opt-in para errores en producción.
+- [ ] Roles granulares: `student`, `teacher`, `admin`, `coordinator`, `student-rep` (hoy: `student`, `teacher`, `admin`, `coordinator`).
 - [ ] **Rate limiting** por docente: máx. X XP por estudiante por día.
 - [ ] **CSP headers + HTTPS Strict Transport** en el host.
 </details>

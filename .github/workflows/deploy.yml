@@ -51,6 +51,12 @@ jobs:
         env:
           # Base path for project Pages site (https://<user>.github.io/<repo>/).
           VITE_BASE: /${{ github.event.repository.name }}/
+          # Backend opcional — define estos secrets en Settings → Secrets → Actions.
+          # Si están vacíos, la app corre en modo demo (localStorage).
+          VITE_SUPABASE_URL:      ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_SENTRY_DSN:        ${{ secrets.VITE_SENTRY_DSN }}
+          VITE_APP_VERSION:       ${{ github.sha }}
         run: npm run build
 
       - name: Setup Pages

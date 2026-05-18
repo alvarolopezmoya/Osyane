@@ -24,12 +24,13 @@ export default defineConfig({
     video: 'retain-on-failure',
   },
 
-  // Arranca el dev server automáticamente.
+  // Usar el build de producción + preview server — más rápido y estable que
+  // el dev server (que compila chunks on-demand y se vuelve lento con varios workers).
   webServer: {
-    command: 'npm run dev',
+    command: 'npm run build && npm run preview -- --port=5173',
     url: 'http://localhost:5173',
     reuseExistingServer: !process.env.CI,
-    timeout: 60_000,
+    timeout: 120_000,
   },
 
   projects: [
